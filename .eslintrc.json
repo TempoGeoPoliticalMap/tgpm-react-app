@@ -1,0 +1,95 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "jest": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:react/recommended",
+    "plugin:import/recommended",
+    "eslint-config-prettier",
+    "next/core-web-vitals"
+  ],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["import", "jest", "prettier", "react"],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [".js", ".jsx"]
+      }
+    ],
+    "react/prop-types": 0,
+    "no-underscore-dangle": ["off"],
+    "no-param-reassign": ["off"],
+    "class-methods-use-this": ["off"],
+    "no-tabs": 0,
+    "quotes": ["error", "double"],
+    "arrow-parens": [0],
+    "react/no-unescaped-entities": 0,
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+        "newlines-between": "always"
+      }
+    ],
+    "react/react-in-jsx-scope": 0,
+    "import/named": 0,
+    "import/namespace": 2,
+    "import/default": 2,
+    "import/export": 2,
+    "import/no-named-as-default": 2,
+    "import/newline-after-import": 2,
+    "no-console": "error",
+    "no-nested-ternary": 2,
+    "no-debugger": "error",
+    "default-case": "error",
+    "no-eval": "error",
+    "no-multi-str": "error",
+    "array-bracket-spacing": ["error", "never"],
+    "comma-dangle": ["error", "never"],
+    "comma-spacing": ["error", {"before": false, "after": true}],
+    "comma-style": ["error", "last"],
+    "func-call-spacing": ["error", "never"],
+    "no-var": "error",
+    "lines-between-class-members": ["error", "always"],
+    "padding-line-between-statements": [
+      "error",
+      {"blankLine": "always", "prev": "*", "next": "function"},
+      {"blankLine": "always", "prev": "*", "next": "class"},
+      {"blankLine": "always", "prev": "block-like", "next": "block-like"},
+      {"blankLine": "always", "prev": "const", "next": "if"},
+      {"blankLine": "always", "prev": "let", "next": "if"},
+      {"blankLine": "always", "prev": "const", "next": "return"},
+      {"blankLine": "always", "prev": "var", "next": "return"}
+    ]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "node": {
+        "paths": ["src"]
+      }
+    }
+  }
+}
