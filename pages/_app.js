@@ -3,8 +3,7 @@ import {useEffect} from "react";
 import "../styles/style.css";
 
 const App = ({Component, pageProps}) => {
-  useEffect(() => {
-  });
+  useEffect(() => {});
 
   return (
     <>

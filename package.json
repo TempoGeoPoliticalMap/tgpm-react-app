@@ -5,8 +5,8 @@
     "dev": "NODE_ENV=development next dev",
     "build": "next build",
     "start": "NODE_ENV=production next start",
-    "lint": "eslint ./src --ext .js,.jsx",
-    "lint:fix": "eslint ./src --fix --ext .js,.jsx",
+    "lint": "eslint ./pages ./src --ext .js,.jsx",
+    "lint:fix": "eslint ./pages ./src --fix --ext .js,.jsx",
     "prepare": "husky install"
   },
   "dependencies": {
