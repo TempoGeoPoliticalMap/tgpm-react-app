@@ -18,9 +18,9 @@ function PaginationClassic() {
       {/*  </ul>*/}
       {/*</nav>*/}
       <div className="text-sm text-slate-500 text-center sm:text-left">
-        Showing <span className="font-medium text-slate-600">467</span> of{" "}
-        <span className="font-medium text-slate-600">467</span> results. Response is limited to{" "}
-        <span className="font-medium text-slate-600">1000</span> records.
+        Showing <span className="font-medium text-slate-600">TBD</span> of{" "}
+        <span className="font-medium text-slate-600">TBD</span> results. Response is limited to{" "}
+        <span className="font-medium text-slate-600">TBD</span> records.
       </div>
     </div>
   );

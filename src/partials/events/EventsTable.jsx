@@ -1,8 +1,11 @@
 import React, {useEffect, useState} from "react";
 
+import {axiosInstance} from "../../api/api";
+
 import EventItem from "./EventsTableItem";
 
 function EventsTable() {
+  // eslint-disable-next-line no-unused-vars
   const events = [
     {
       type: "WARFARE_AND_ARMED_CONFLICTS",
@@ -62,12 +65,22 @@ function EventsTable() {
   // const [selectAll, setSelectAll] = useState(false);
   // const [isCheck, setIsCheck] = useState([]);
   // const [isCheck] = useState([]);
-  const [list, setList] = useState([]);
+  // const [list, setList] = useState([]);
+  const [eventsList, setEventsList] = useState([]);
 
+  // GET with Axios
   useEffect(() => {
-    setList(events);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const eventsList = async () => {
+      let response = await axiosInstance.get("");
+      setEventsList(response.data);
+    };
+    eventsList();
   }, []);
+
+  // useEffect(() => {
+  //   setList(eventsList);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   // const handleSelectAll = () => {
   //   setSelectAll(!selectAll);
@@ -136,18 +149,23 @@ function EventsTable() {
             </thead>
             {/* Table body */}
             <tbody className="text-sm divide-y divide-slate-200 border-b border-slate-200">
-              {list.map(event => {
+              {eventsList.map(event => {
                 return (
                   <EventItem
-                    key={event.id}
+                    // key={event.id}
+                    key={event.wikidataId}
                     type={event.type}
-                    id={event.id}
+                    // id={event.id}
+                    id={event.wikidataId}
                     name={event.name}
-                    status={event.status}
-                    startDateTime={event.startDateTime}
-                    endDateTime={event.endDateTime}
-                    territories={event.territories}
-                    locations={event.locations}
+                    // status={event.status}
+                    status={event.timeStateRelativeToNow}
+                    startDateTime={event.startTime}
+                    endDateTime={event.endTime}
+                    // territories={event.territories}
+                    // territories={"[]"}
+                    // locations={event.locations}
+                    // locations={"[]"}
                   />
                 );
               })}
