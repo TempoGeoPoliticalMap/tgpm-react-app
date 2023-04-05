@@ -54,10 +54,12 @@ function EventsTableItem(props) {
         <div className="text-left">{props.endDateTime}</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        <div className="text-left">{props.territories.join(", ")}</div>
+        {/*<div className="text-left">{props.territories.join(", ")}</div>*/}
+        <div className="text-left">TBD</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        <div className="text-left">{props.locations.map(value => value.name).join(", ")}</div>
+        {/*<div className="text-left">{props.locations.map(value => value.name).join(", ")}</div>*/}
+        <div className="text-left">TBD</div>
       </td>
     </tr>
   );
