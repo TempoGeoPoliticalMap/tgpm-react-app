@@ -4,7 +4,7 @@ import axios from "axios";
 /** Setup an API instance */
 export const axiosInstance = axios.create({
   // baseURL: ENV.API_HOST,
-  baseURL: "https://tgpm-backend-py-flask.azurewebsites.net/v1/events",
+  baseURL: "https://api.tgpm.world/",
   withCredentials: false,
   headers: {
     "Content-Type": "application/json",

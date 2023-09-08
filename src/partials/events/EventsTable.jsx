@@ -71,7 +71,7 @@ function EventsTable() {
   // GET with Axios
   useEffect(() => {
     const eventsList = async () => {
-      let response = await axiosInstance.get("");
+      let response = await axiosInstance.get("v1/events");
       setEventsList(response.data);
     };
     eventsList();
