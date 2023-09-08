@@ -6,7 +6,7 @@
 # the api is currently deployed to the low-spec server, which has a cold start-up (can take a few minutes),
 #   go to the page manually before running this script to make sure the server is up:
 #     https://tgpm-backend-py-flask.azurewebsites.net/
-curl -X GET "https://tgpm-backend-py-flask.azurewebsites.net/openapi.json" > scripts/openapi/openapi.yaml
+curl -X GET "https://api.tgpm.world/openapi.json" > scripts/openapi/openapi.yaml
 
 # make global params optional
 sed -i '' '/Accept/,/required/ s/true/false/g' scripts/openapi/openapi.yaml
