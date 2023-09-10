@@ -140,10 +140,10 @@ function EventsTable() {
                   <div className="font-semibold text-left">End Date/Time</div>
                 </th>
                 <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                  <div className="font-semibold text-left">Countries/ Territories</div>
+                  <div className="font-semibold text-left">Countries/Territories</div>
                 </th>
                 <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                  <div className="font-semibold text-left">Geolocations</div>
+                  <div className="font-semibold text-left">Locations</div>
                 </th>
               </tr>
             </thead>
