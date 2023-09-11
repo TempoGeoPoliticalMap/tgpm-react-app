@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 
 import {axiosInstance} from "../../api/api";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 import EventItem from "./EventsTableItem";
 
@@ -67,12 +68,15 @@ function EventsTable() {
   // const [isCheck] = useState([]);
   // const [list, setList] = useState([]);
   const [eventsList, setEventsList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // GET with Axios
   useEffect(() => {
+    setLoading(true);
     const eventsList = async () => {
       let response = await axiosInstance.get("v1/events");
       setEventsList(response.data);
+      setLoading(false);
     };
     eventsList();
   }, []);
@@ -103,6 +107,8 @@ function EventsTable() {
   //   selectedItems(isCheck);
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [isCheck]);
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="bg-white">
