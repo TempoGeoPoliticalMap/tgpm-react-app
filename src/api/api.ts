@@ -5,6 +5,7 @@ import axios from "axios";
 export const axiosInstance = axios.create({
   // baseURL: ENV.API_HOST,
   baseURL: "https://api.tgpm.world/",
+  proxy: false,
   withCredentials: false,
   headers: {
     "Content-Type": "application/json",
