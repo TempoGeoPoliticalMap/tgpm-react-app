@@ -2,8 +2,6 @@ import React from "react";
 
 import EventsTable from "../partials/events/EventsTable";
 
-import PaginationClassic from "./PaginationClassic";
-
 function Events() {
   // const [sidebarOpen, setSidebarOpen] = useState(false);
   // const [selectedItems, setSelectedItems] = useState([]);
@@ -85,9 +83,9 @@ function Events() {
             <EventsTable />
 
             {/* Pagination */}
-            <div className="mt-8">
-              <PaginationClassic />
-            </div>
+            {/*<div className="mt-8">*/}
+            {/*  <PaginationClassic />*/}
+            {/*</div>*/}
           </div>
         </main>
       </div>
