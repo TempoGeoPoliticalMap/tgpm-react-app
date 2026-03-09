@@ -69,16 +69,22 @@ function EventsTable() {
   // const [list, setList] = useState([]);
   const [eventsList, setEventsList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // GET with Axios
   useEffect(() => {
     setLoading(true);
-    const eventsList = async () => {
-      let response = await axiosInstance.get("v1/events");
-      setEventsList(response.data);
-      setLoading(false);
+    const fetchEvents = async () => {
+      try {
+        let response = await axiosInstance.get("v1/events");
+        setEventsList(response.data);
+      } catch (err) {
+        setError("Failed to load events. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
-    eventsList();
+    fetchEvents();
   }, []);
 
   // useEffect(() => {
