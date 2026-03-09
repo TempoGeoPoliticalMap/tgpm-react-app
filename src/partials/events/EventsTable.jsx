@@ -115,6 +115,7 @@ function EventsTable() {
   // }, [isCheck]);
 
   if (loading) return <LoadingSpinner />;
+  if (error) return <div className="p-5 text-red-500">{error}</div>;
 
   return (
     <div className="bg-white">
