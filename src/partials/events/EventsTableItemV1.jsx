@@ -1,8 +1,8 @@
 import React from "react";
 
-import {STATUSES, TYPES} from "../../constants/events";
+import {STATUSES, TYPES} from "../../constants/eventsV1Types";
 
-function EventsTableItem(props) {
+function EventsTableItemV1(props) {
   const statusColor = status => {
     switch (status) {
       case "PAST":
@@ -16,26 +16,13 @@ function EventsTableItem(props) {
     }
   };
 
-  // const amountColor = amount => {
-  //   switch (amount.charAt(0)) {
-  //     case "+":
-  //       return "text-emerald-500";
-  //     default:
-  //       return "text-slate-700";
-  //   }
-  // };
-
   return (
-    <tr>
+    <tr className="text-black">
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
         <div className="text-left">{TYPES[props.type].NAME}</div>
-        {/*<div className="text-left">{TYPES.WARFARE_AND_ARMED_CONFLICTS.NAME}</div>*/}
       </td>
-      {/*<td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">*/}
-      {/*    <div className="text-left">{props.id}</div>*/}
-      {/*</td>*/}
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        <div className="text-left">{props.name}</div>
+        <div className="text-left font-bold">{props.name}</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
         <div className="text-center">
@@ -54,15 +41,13 @@ function EventsTableItem(props) {
         <div className="text-left">{props.endDateTime}</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        {/*<div className="text-left">{props.territories.join(", ")}</div>*/}
-        <div className="text-left">TBD</div>
+        <div className="text-left">{props.countries}</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        {/*<div className="text-left">{props.locations.map(value => value.name).join(", ")}</div>*/}
-        <div className="text-left">TBD</div>
+        <div className="text-left">{props.locations}</div>
       </td>
     </tr>
   );
 }
 
-export default EventsTableItem;
+export default EventsTableItemV1;
