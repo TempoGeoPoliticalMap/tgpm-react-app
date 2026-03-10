@@ -1,13 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=fallback');
 
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
+@import 'tailwindcss';
 
 /* Additional styles */
-@import 'additional-styles/utility-patterns.css';
-@import 'additional-styles/range-slider.css';
-@import 'additional-styles/toggle-switch.css';
-@import 'additional-styles/flatpickr.css';
-@import 'additional-styles/theme.css';
+@import './additional-styles/utility-patterns.css';
+@import './additional-styles/range-slider.css';
+@import './additional-styles/toggle-switch.css';
+@import './additional-styles/flatpickr.css';
+@import './additional-styles/theme.css';
 
-@import 'tailwindcss/utilities';
+/* Filter bar — black placeholder text */
+.filter-bar {
+  --ant-color-text-placeholder: #000;
+}
+.filter-bar .ant-select-selection-placeholder,
+.filter-bar .ant-picker-input input::placeholder {
+  color: #000 !important;
+  opacity: 1;
+}
