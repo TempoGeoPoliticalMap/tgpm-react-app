@@ -1,5 +1,4 @@
 import React, {useEffect, useRef, useState} from "react";
-import Image from "next/image";
 
 function MinimalHeader({
   activeTab,
@@ -59,12 +58,11 @@ function MinimalHeader({
         {/* Logo */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/images/logo.png"
               alt="TGPM logo"
-              height={32}
-              width={32}
-              style={{width: "auto", position: "relative", top: "1px"}}
+              style={{height: 32, width: "auto", position: "relative", top: "1px"}}
             />
             <span className="text-white font-bold text-lg tracking-wide">TempoGeoPoliticalMap</span>
           </div>

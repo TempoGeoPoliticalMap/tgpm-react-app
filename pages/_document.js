@@ -10,6 +10,9 @@ function Document() {
   return (
     <Html lang="en">
       <Head>
+        {/* Sitemap */}
+        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
         {/* Favicons */}
         <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16.png" />
