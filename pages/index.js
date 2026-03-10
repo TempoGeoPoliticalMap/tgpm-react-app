@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-
+import {useState} from "react";
+import Head from "next/head";
 import {DatePicker} from "antd";
 
 import MinimalHeader from "../src/components/MinimalHeader";
@@ -14,10 +14,10 @@ const {RangePicker} = DatePicker;
 const STORAGE_KEY = "tgpm-header-collapsed";
 
 const VIEWS = [
-  {id: "table",    label: "Table"},
+  {id: "table", label: "Table"},
   {id: "timeline", label: "Timeline"},
-  {id: "map",      label: "Map"},
-  {id: "compact",  label: "Compact"}
+  {id: "map", label: "Map"},
+  {id: "compact", label: "Compact"}
 ];
 
 function Home() {
@@ -25,11 +25,10 @@ function Home() {
   const [activeView, setActiveView] = useState("table");
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [dateRange, setDateRange] = useState([null, null]);
-  const [collapsed, setCollapsed] = useState(false);
-
-  useEffect(() => {
-    if (localStorage.getItem(STORAGE_KEY) === "true") setCollapsed(true);
-  }, []);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(STORAGE_KEY) === "true";
+  });
 
   const onCollapse = () => {
     setCollapsed(prev => {
@@ -57,29 +56,57 @@ function Home() {
 
   const renderTab = () => {
     switch (activeTab) {
-      case "v1-live": return <EventsV1 key="v1-live" />;
-      case "v1-mock": return <EventsV1 key="v1-mock" mockData={mockEventsV1} />;
-      case "v2-live": return <EventsV2 key="v2-live" activeView={activeView} typeFilter={selectedTypes} fromDate={fromDate} toDate={toDate} />;
-      case "v2-mock": return <EventsV2 key="v2-mock" activeView={activeView} mockData={mockEventsV2} typeFilter={selectedTypes} fromDate={fromDate} toDate={toDate} />;
+      case "v1-live":
+        return <EventsV1 key="v1-live" />;
+      case "v1-mock":
+        return <EventsV1 key="v1-mock" mockData={mockEventsV1} />;
+      case "v2-live":
+        return (
+          <EventsV2
+            key="v2-live"
+            activeView={activeView}
+            typeFilter={selectedTypes}
+            fromDate={fromDate}
+            toDate={toDate}
+          />
+        );
+      case "v2-mock":
+        return (
+          <EventsV2
+            key="v2-mock"
+            activeView={activeView}
+            mockData={mockEventsV2}
+            typeFilter={selectedTypes}
+            fromDate={fromDate}
+            toDate={toDate}
+          />
+        );
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden bg-white">
-      <MinimalHeader
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        filtersNode={filtersNode}
-        activeView={activeView}
-        onViewChange={setActiveView}
-        views={VIEWS}
-        collapsed={collapsed}
-        onCollapse={onCollapse}
-      />
-      <main className="grow" style={{paddingTop: collapsed ? 0 : "36px"}}>
-        {renderTab()}
-      </main>
-    </div>
+    <>
+      <Head>
+        <title>TempoGeoPoliticalMap — World Political Events from Wikipedia</title>
+      </Head>
+      <div className="flex flex-col min-h-screen overflow-hidden bg-white">
+        <MinimalHeader
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          filtersNode={filtersNode}
+          activeView={activeView}
+          onViewChange={setActiveView}
+          views={VIEWS}
+          collapsed={collapsed}
+          onCollapse={onCollapse}
+        />
+        <main className="grow" style={{paddingTop: collapsed ? 0 : "36px"}}>
+          {renderTab()}
+        </main>
+      </div>
+    </>
   );
 }
 

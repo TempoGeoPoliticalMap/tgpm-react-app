@@ -2,7 +2,8 @@ import {Html, Head, Main, NextScript} from "next/document";
 
 const SITE_URL = "https://tgpm.world";
 const TITLE = "TempoGeoPoliticalMap — World Political Events from Wikipedia";
-const DESCRIPTION = "An open-source project that reduces informational bias by presenting unfiltered geopolitical events of interest directly from Wikipedia.";
+const DESCRIPTION =
+  "An open-source project that reduces informational bias by presenting unfiltered geopolitical events of interest directly from Wikipedia.";
 const OG_IMAGE = `${SITE_URL}/images/header-hero.png`;
 
 function Document() {
@@ -34,9 +35,6 @@ function Document() {
         <meta name="twitter:title" content={TITLE} />
         <meta name="twitter:description" content={DESCRIPTION} />
         <meta name="twitter:image" content={OG_IMAGE} />
-
-        {/* Page title */}
-        <title>{TITLE}</title>
       </Head>
       <body className="font-inter antialiased bg-gray-900 text-gray-200 tracking-tight">
         <Main />

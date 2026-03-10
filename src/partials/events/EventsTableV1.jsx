@@ -17,6 +17,7 @@ function EventsTableV1({data}) {
       setTimeout(() => setLoading(false), 500);
       return;
     }
+
     const fetchEvents = async () => {
       try {
         let response = await axiosInstance.get("v1/events");
@@ -28,8 +29,7 @@ function EventsTableV1({data}) {
       }
     };
     fetchEvents();
-    return () => {
-    };
+    return () => {};
   }, [data]);
 
   if (loading) return <LoadingSpinner />;

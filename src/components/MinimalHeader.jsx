@@ -1,7 +1,16 @@
 import React, {useEffect, useRef, useState} from "react";
 import Image from "next/image";
 
-function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewChange, views = [], collapsed, onCollapse}) {
+function MinimalHeader({
+  activeTab,
+  onTabChange,
+  filtersNode,
+  activeView,
+  onViewChange,
+  views = [],
+  collapsed,
+  onCollapse
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modeOpen, setModeOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
@@ -10,10 +19,10 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
   const viewRef = useRef(null);
 
   const navLinks = [
-    {label: "DEV",  href: "https://github.com/orgs/TempoGeoPoliticalMap/projects/1"},
-    {label: "GIT",  href: "https://github.com/TempoGeoPoliticalMap"},
+    {label: "DEV", href: "https://github.com/orgs/TempoGeoPoliticalMap/projects/1"},
+    {label: "GIT", href: "https://github.com/TempoGeoPoliticalMap"},
     {label: "DOCS", href: "https://docs.tgpm.world"},
-    {label: "API",  href: "https://api.tgpm.world"}
+    {label: "API", href: "https://api.tgpm.world"}
   ];
 
   // Close dropdowns on outside click
@@ -28,9 +37,7 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
   }, []);
 
   return (
-    <header
-      className="relative z-[2000] w-full"
-      style={{background: "#7f0000"}}>
+    <header className="relative z-[2000] w-full" style={{background: "#7f0000"}}>
       {/* Hero background image */}
       <div
         className="absolute inset-0"
@@ -52,14 +59,20 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
         {/* Logo */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <Image src="/images/logo.png" alt="TGPM logo" height={32} width={32} style={{width: "auto", position: "relative", top: "1px"}} />
+            <Image
+              src="/images/logo.png"
+              alt="TGPM logo"
+              height={32}
+              width={32}
+              style={{width: "auto", position: "relative", top: "1px"}}
+            />
             <span className="text-white font-bold text-lg tracking-wide">TempoGeoPoliticalMap</span>
           </div>
         </div>
 
         {/* Filter — centred in top bar when collapsed */}
         {collapsed && filtersNode && (
-          <div className="filter-bar absolute left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white rounded shadow-lg p-2 z-20">
+          <div className="filter-bar absolute left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white rounded shadow-lg px-2.5 py-2 z-20">
             {filtersNode}
           </div>
         )}
@@ -74,9 +87,22 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
                   onClick={() => setModeOpen(prev => !prev)}
                   className="flex items-center gap-1.5 text-white text-sm font-semibold px-3 py-1 hover:bg-white/10 transition-colors">
                   {activeTab === "v2-live" ? "Data: Live" : "Data: Mock"}
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-                    style={{transform: modeOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease"}}>
-                    <path d="M1 3L5 7L9 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    style={{
+                      transform: modeOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.2s ease"
+                    }}>
+                    <path
+                      d="M1 3L5 7L9 3"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </button>
               </div>
@@ -88,7 +114,10 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
                   ].map(({id, label}) => (
                     <button
                       key={id}
-                      onClick={() => { onTabChange(id); setModeOpen(false); }}
+                      onClick={() => {
+                        onTabChange(id);
+                        setModeOpen(false);
+                      }}
                       className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors ${
                         activeTab === id ? "bg-slate-100 text-slate-900" : "text-slate-700 hover:bg-slate-50"
                       }`}>
@@ -108,9 +137,22 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
                   onClick={() => setViewOpen(prev => !prev)}
                   className="flex items-center gap-1.5 text-white text-sm font-semibold px-3 py-1 hover:bg-white/10 transition-colors">
                   {`View: ${views.find(v => v.id === activeView)?.label ?? "View"}`}
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-                    style={{transform: viewOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease"}}>
-                    <path d="M1 3L5 7L9 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    style={{
+                      transform: viewOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.2s ease"
+                    }}>
+                    <path
+                      d="M1 3L5 7L9 3"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </button>
               </div>
@@ -119,7 +161,10 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
                   {views.map(({id, label}) => (
                     <button
                       key={id}
-                      onClick={() => { onViewChange(id); setViewOpen(false); }}
+                      onClick={() => {
+                        onViewChange(id);
+                        setViewOpen(false);
+                      }}
                       className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors ${
                         activeView === id ? "bg-slate-100 text-slate-900" : "text-slate-700 hover:bg-slate-50"
                       }`}>
@@ -174,7 +219,7 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
                 transform: collapsed ? "rotate(180deg)" : "rotate(0deg)",
                 transition: "transform 0.25s ease"
               }}>
-              <path d="M2 5L7 10L12 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 5L7 10L12 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </nav>
@@ -190,18 +235,19 @@ function MinimalHeader({activeTab, onTabChange, filtersNode, activeView, onViewC
         }}>
         <div className="relative z-10 px-6 pt-4 pb-16 flex flex-col items-center text-center">
           <h1 className="text-white text-3xl font-bold leading-tight mb-3">
-            Explore the World&apos;s political events<br />
+            Explore the World&apos;s political events
+            <br />
             with data straight from Wikipedia
           </h1>
           <p className="text-white-100 text-l leading-relaxed max-w-xl">
-            TGPM is an open-source project designed to reduce informational bias by
-            presenting unfiltered events of interest directly from Wikipedia.
+            TGPM is an open-source project designed to reduce informational bias by presenting unfiltered events of
+            interest directly from Wikipedia.
           </p>
         </div>
 
         {/* Filter — overlays the bottom edge of the header when expanded */}
         {filtersNode && (
-          <div className="filter-bar absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex items-center gap-2 bg-white rounded shadow-xl px-4 py-2 z-30">
+          <div className="filter-bar absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex items-center gap-2 bg-white rounded shadow-xl px-5 py-2 z-30">
             {filtersNode}
           </div>
         )}

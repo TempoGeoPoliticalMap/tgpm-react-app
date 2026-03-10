@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from "react";
-import {Link} from "react-router-dom";
 import Image from "next/image";
 
+import {Link} from "../utils/routerCompat";
 import Transition from "../utils/Transition";
 import UserAvatar from "../../public/images/user-avatar-32.png";
 

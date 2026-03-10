@@ -1,5 +1,4 @@
 import React from "react";
-
 import {DatePicker} from "antd";
 
 function EventTimeframeFilterV2({fromDate, toDate, onFromChange, onToChange}) {

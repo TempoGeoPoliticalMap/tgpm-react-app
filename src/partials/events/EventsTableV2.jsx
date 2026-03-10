@@ -1,16 +1,23 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 
 import {axiosInstance} from "../../api/api";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import {filterAndSortEventsV2} from "../../utils/filterAndSortEventsV2";
 
 import EventsTableItemV2 from "./EventsTableItemV2";
 
-function EventsTableV2({data, typeFilter, statusFilter, regionFilter, fromDate, toDate}) {
+function EventsTableV2({data, typeFilter, statusFilter, regionFilter, fromDate, toDate, events}) {
   const [eventsList, setEventsList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (events) {
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     if (data) {
       setEventsList(data.data);
       setError(null);
@@ -22,6 +29,7 @@ function EventsTableV2({data, typeFilter, statusFilter, regionFilter, fromDate, 
     const fetchEvents = async () => {
       try {
         let response = await axiosInstance.get("v2/events");
+
         if (!cancelled) setEventsList(response.data.data);
       } catch (err) {
         if (!cancelled) setError("Failed to load events. Please try again later.");
@@ -33,7 +41,12 @@ function EventsTableV2({data, typeFilter, statusFilter, regionFilter, fromDate, 
     return () => {
       cancelled = true;
     };
-  }, [data]);
+  }, [data, events]);
+
+  const filteredEvents = useMemo(() => {
+    if (events) return events;
+    return filterAndSortEventsV2(eventsList, {typeFilter, statusFilter, regionFilter, fromDate, toDate});
+  }, [events, eventsList, typeFilter, statusFilter, regionFilter, fromDate, toDate]);
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="p-5 text-red-500">{error}</div>;
@@ -72,20 +85,7 @@ function EventsTableV2({data, typeFilter, statusFilter, regionFilter, fromDate, 
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-slate-200 border-b border-slate-200">
-              {eventsList
-                .filter(e => !typeFilter?.length || typeFilter.includes(e.type))
-                .filter(e => !statusFilter?.length || statusFilter.includes(e.timeStateRelativeToNow))
-                .filter(e => !fromDate || !e.endDateTime || fromDate.isBefore(e.endDateTime, "day"))
-                .filter(e => !toDate || toDate.isAfter(e.startDateTime, "day"))
-                .filter(e => !regionFilter?.length || e.regions?.some(r => regionFilter.includes(r)))
-                .sort((a, b) => {
-                  const startDiff = new Date(a.startDateTime) - new Date(b.startDateTime);
-                  if (startDiff !== 0) return startDiff;
-                  const aEnd = a.endDateTime ? new Date(a.endDateTime) : Infinity;
-                  const bEnd = b.endDateTime ? new Date(b.endDateTime) : Infinity;
-                  return aEnd - bEnd;
-                })
-                .map(event => (
+              {filteredEvents.map(event => (
                 <EventsTableItemV2
                   key={event.wikidataId}
                   type={event.type}

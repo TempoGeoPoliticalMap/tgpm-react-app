@@ -1,33 +1,7 @@
 import React from "react";
-
-import {
-  AlertOutlined,
-  ApartmentOutlined,
-  BankOutlined,
-  ClusterOutlined,
-  FileProtectOutlined,
-  FireOutlined,
-  GlobalOutlined,
-  MessageOutlined,
-  SafetyOutlined,
-  WarningOutlined
-} from "@ant-design/icons";
 import {Select} from "antd";
 
-import {TYPES} from "../../constants/eventsV2Types";
-
-export const TYPE_ICONS = {
-  WARFARE_AND_ARMED_CONFLICTS: <FireOutlined />,
-  POLITICAL_CRISIS: <WarningOutlined />,
-  POLITICAL_MURDER: <AlertOutlined />,
-  MILITARY_ALLIANCE: <SafetyOutlined />,
-  MULTINATIONAL_MILITARY_COALITION: <ApartmentOutlined />,
-  GEOPOLITICAL_GROUP: <GlobalOutlined />,
-  INTERNATIONAL_ORGANISATION: <BankOutlined />,
-  POLITICAL_CONFERENCE: <MessageOutlined />,
-  SOURCE_OF_INTERNATIONAL_LAW: <FileProtectOutlined />,
-  SUPRANATIONAL_UNION: <ClusterOutlined />
-};
+import {TYPE_ICONS, TYPES} from "../../constants/eventsV2Types";
 
 const OPTIONS = Object.keys(TYPE_ICONS).map(key => ({
   value: key,
@@ -48,7 +22,11 @@ function EventTypeLegendV2({selectedTypes, onChange}) {
       value={selectedTypes}
       onChange={onChange}
       options={OPTIONS}
-      style={{minWidth: 224}}
+      virtual={false}
+      listHeight={1000}
+      getPopupContainer={trigger => trigger.parentElement}
+      dropdownStyle={{zIndex: 2300, maxHeight: "none", overflow: "visible"}}
+      style={{minWidth: 269}}
     />
   );
 }

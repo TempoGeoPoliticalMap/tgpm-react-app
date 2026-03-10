@@ -7,6 +7,7 @@ export function formatDateTime(isoString) {
   if (!isoString) return null;
 
   const date = new Date(isoString);
+
   if (isNaN(date.getTime())) return isoString;
 
   const yyyy = date.getUTCFullYear();

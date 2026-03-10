@@ -1,17 +1,9 @@
-import React, {useRef, useEffect, useContext} from "react";
+import React, {useRef, useContext} from "react";
 import {CSSTransition as ReactCSSTransition} from "react-transition-group";
 
 const TransitionContext = React.createContext({
   parent: {}
 });
-
-function useIsInitialRender() {
-  const isInitialRender = useRef(true);
-  useEffect(() => {
-    isInitialRender.current = false;
-  }, []);
-  return isInitialRender.current;
-}
 
 function CSSTransition({
   show,
@@ -86,11 +78,10 @@ function CSSTransition({
 
 function Transition({show, appear, ...rest}) {
   const {parent} = useContext(TransitionContext);
-  const isInitialRender = useIsInitialRender();
   const isChild = show === undefined;
 
   if (isChild) {
-    return <CSSTransition appear={parent.appear || !parent.isInitialRender} show={parent.show} {...rest} />;
+    return <CSSTransition appear={parent.appear} show={parent.show} {...rest} />;
   }
 
   return (
@@ -98,7 +89,6 @@ function Transition({show, appear, ...rest}) {
       value={{
         parent: {
           show,
-          isInitialRender,
           appear
         }
       }}>
