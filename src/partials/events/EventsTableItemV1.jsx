@@ -1,6 +1,7 @@
 import React from "react";
 
 import {STATUSES, TYPES} from "../../constants/eventsV1Types";
+import {formatDateTime} from "../../utils/formatDateTime";
 
 function EventsTableItemV1(props) {
   const statusColor = status => {
@@ -35,10 +36,10 @@ function EventsTableItemV1(props) {
         </div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        <div className="text-left">{props.startDateTime}</div>
+        <div className="text-left">{formatDateTime(props.startDateTime)}</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        <div className="text-left">{props.endDateTime}</div>
+        <div className="text-left">{formatDateTime(props.endDateTime)}</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
         <div className="text-left">{props.countries}</div>

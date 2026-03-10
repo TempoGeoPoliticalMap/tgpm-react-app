@@ -8,3 +8,13 @@
 @import './additional-styles/toggle-switch.css';
 @import './additional-styles/flatpickr.css';
 @import './additional-styles/theme.css';
+
+/* Filter bar — black placeholder text */
+.filter-bar {
+  --ant-color-text-placeholder: #000;
+}
+.filter-bar .ant-select-selection-placeholder,
+.filter-bar .ant-picker-input input::placeholder {
+  color: #000 !important;
+  opacity: 1;
+}
