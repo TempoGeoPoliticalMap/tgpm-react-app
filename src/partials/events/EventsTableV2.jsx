@@ -29,10 +29,10 @@ function EventsTableV2({events = []}) {
                 <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                   <div className="font-semibold text-left">Regions</div>
                 </th>
-                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-32">
                   <div className="font-semibold text-left">Countries</div>
                 </th>
-                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-32">
                   <div className="font-semibold text-left">Locations</div>
                 </th>
               </tr>

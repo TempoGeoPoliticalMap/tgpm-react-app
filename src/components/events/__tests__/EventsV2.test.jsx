@@ -36,22 +36,28 @@ describe("EventsV2", () => {
     useEventsV2.mockReturnValue({events: FIXTURE_EVENTS, loading: false, error: null});
   });
 
-  test("shows loading spinner while hook is loading", () => {
+  test("shows loading spinner while hook is loading", async () => {
     useEventsV2.mockReturnValue({events: [], loading: true, error: null});
     wrap(<EventsV2 />);
-    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
+    });
   });
 
-  test("shows error message on failed fetch", () => {
+  test("shows error message on failed fetch", async () => {
     useEventsV2.mockReturnValue({events: [], loading: false, error: "Request failed"});
     wrap(<EventsV2 />);
-    expect(screen.getByText("Request failed")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Request failed")).toBeInTheDocument();
+    });
   });
 
-  test("with mockData: renders events without spinner and without consulting live hook", () => {
+  test("with mockData: renders events without spinner and without consulting live hook", async () => {
     useEventsV2.mockReturnValue({events: [], loading: true, error: null});
     wrap(<EventsV2 mockData={{data: FIXTURE_EVENTS}} />);
-    expect(screen.queryByTestId("loading-spinner")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByTestId("loading-spinner")).not.toBeInTheDocument();
+    });
   });
 
   test("renders table view by default", async () => {

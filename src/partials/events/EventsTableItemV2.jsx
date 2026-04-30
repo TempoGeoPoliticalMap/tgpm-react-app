@@ -76,11 +76,11 @@ function EventsTableItemV2(props) {
           ))}
         </div>
       </td>
-      <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        <div className="text-left">{props.countries?.map(c => c.name).join(", ")}</div>
+      <td className="px-2 first:pl-5 last:pr-5 py-0.5 w-32 max-w-0">
+        <div className="text-left truncate">{props.countries?.map(c => c.name).join(", ")}</div>
       </td>
-      <td className="px-2 first:pl-5 last:pr-5 py-0.5 whitespace-nowrap">
-        <div className="text-left">{props.locations?.map(l => l.name).join(", ")}</div>
+      <td className="px-2 first:pl-5 last:pr-5 py-0.5 w-32 max-w-0">
+        <div className="text-left truncate">{props.locations?.map(l => l.name).join(", ")}</div>
       </td>
     </tr>
   );

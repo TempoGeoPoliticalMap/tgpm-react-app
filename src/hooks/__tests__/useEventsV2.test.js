@@ -6,11 +6,12 @@ import {networkErrorHandler, FIXTURE_EVENTS} from "../../mocks/handlers";
 import {useEventsV2} from "../useEventsV2";
 
 describe("useEventsV2", () => {
-  test("starts in loading state with empty events", () => {
+  test("starts in loading state with empty events", async () => {
     const {result} = renderHook(() => useEventsV2());
     expect(result.current.loading).toBe(true);
     expect(result.current.events).toEqual([]);
     expect(result.current.error).toBeNull();
+    await act(async () => {});
   });
 
   test("populates events after successful fetch", async () => {
@@ -31,8 +32,10 @@ describe("useEventsV2", () => {
   test("does not update state after unmount", async () => {
     const spy = jest.spyOn(console, "error").mockImplementation(() => {});
     const {unmount} = renderHook(() => useEventsV2());
-    unmount();
-    await act(async () => {});
+    await act(async () => {
+      unmount();
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
     expect(spy).not.toHaveBeenCalledWith(expect.stringContaining("Can't perform a React state update"));
     spy.mockRestore();
   });
