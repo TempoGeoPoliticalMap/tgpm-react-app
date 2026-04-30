@@ -1,20 +1,10 @@
 import React, {useEffect, useRef, useState} from "react";
+import PropTypes from "prop-types";
 
-function MinimalHeader({
-  activeTab,
-  onTabChange,
-  filtersNode,
-  activeView,
-  onViewChange,
-  views = [],
-  collapsed,
-  onCollapse
-}) {
+function MinimalHeader({filtersNode, activeView, onViewChange, views = [], collapsed, onCollapse}) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [modeOpen, setModeOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
   const menuRef = useRef(null);
-  const modeRef = useRef(null);
   const viewRef = useRef(null);
 
   const navLinks = [
@@ -28,7 +18,6 @@ function MinimalHeader({
   useEffect(() => {
     const handler = e => {
       if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
-      if (modeRef.current && !modeRef.current.contains(e.target)) setModeOpen(false);
       if (viewRef.current && !viewRef.current.contains(e.target)) setViewOpen(false);
     };
     document.addEventListener("mousedown", handler);
@@ -77,56 +66,6 @@ function MinimalHeader({
 
         {/* View dropdown + burger + collapse */}
         <nav className="flex items-center gap-1 flex-shrink-0">
-          {/* Mock / Live dropdown */}
-          {onTabChange && (
-            <div ref={modeRef} className="relative">
-              <div className="flex rounded overflow-hidden" style={{border: "1.5px solid rgba(255,255,255,0.4)"}}>
-                <button
-                  onClick={() => setModeOpen(prev => !prev)}
-                  className="flex items-center gap-1.5 text-white text-sm font-semibold px-3 py-1 hover:bg-white/10 transition-colors">
-                  {activeTab === "v2-live" ? "Data: Live" : "Data: Mock"}
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 10 10"
-                    fill="none"
-                    style={{
-                      transform: modeOpen ? "rotate(180deg)" : "rotate(0deg)",
-                      transition: "transform 0.2s ease"
-                    }}>
-                    <path
-                      d="M1 3L5 7L9 3"
-                      stroke="white"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-              </div>
-              {modeOpen && (
-                <div className="absolute right-0 top-full mt-2 w-28 bg-white rounded overflow-hidden shadow-xl z-[1000]">
-                  {[
-                    {id: "v2-mock", label: "Data: Mock"},
-                    {id: "v2-live", label: "Data: Live"}
-                  ].map(({id, label}) => (
-                    <button
-                      key={id}
-                      onClick={() => {
-                        onTabChange(id);
-                        setModeOpen(false);
-                      }}
-                      className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors ${
-                        activeTab === id ? "bg-slate-100 text-slate-900" : "text-slate-700 hover:bg-slate-50"
-                      }`}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
           {/* View dropdown */}
           {views.length > 0 && (
             <div ref={viewRef} className="relative mr-3">
@@ -253,5 +192,14 @@ function MinimalHeader({
     </header>
   );
 }
+
+MinimalHeader.propTypes = {
+  filtersNode: PropTypes.node,
+  activeView: PropTypes.string,
+  onViewChange: PropTypes.func,
+  views: PropTypes.arrayOf(PropTypes.shape({id: PropTypes.string, label: PropTypes.string})),
+  collapsed: PropTypes.bool,
+  onCollapse: PropTypes.func
+};
 
 export default MinimalHeader;

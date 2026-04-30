@@ -83,3 +83,13 @@ export const REGIONS = {
   SOUTH_ASIA: "South Asia",
   SUB_SAHARAN_AFRICA: "Sub-Saharan Africa"
 };
+
+export const REGION_COLORS = {
+  EAST_ASIA_AND_PACIFIC: "bg-red-100 text-red-700",
+  EUROPE_AND_CENTRAL_ASIA: "bg-blue-100 text-blue-700",
+  LATIN_AMERICA_AND_CARIBBEAN: "bg-green-100 text-green-700",
+  MIDDLE_EAST_AND_NORTH_AFRICA: "bg-amber-100 text-amber-700",
+  NORTH_AMERICA: "bg-indigo-100 text-indigo-700",
+  SOUTH_ASIA: "bg-orange-100 text-orange-700",
+  SUB_SAHARAN_AFRICA: "bg-yellow-100 text-yellow-800"
+};

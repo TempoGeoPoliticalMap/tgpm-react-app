@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {Select} from "antd";
 
 import {TYPE_ICONS, TYPES} from "../../constants/eventsV2Types";
@@ -30,5 +31,10 @@ function EventTypeLegendV2({selectedTypes, onChange}) {
     />
   );
 }
+
+EventTypeLegendV2.propTypes = {
+  selectedTypes: PropTypes.array,
+  onChange: PropTypes.func.isRequired
+};
 
 export default EventTypeLegendV2;

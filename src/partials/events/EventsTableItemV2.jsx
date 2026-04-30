@@ -1,19 +1,11 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {Tooltip} from "antd";
 
-import {REGIONS, STATUSES, TYPES} from "../../constants/eventsV2Types";
+import {REGION_COLORS, REGIONS, STATUSES, TYPES} from "../../constants/eventsV2Types";
 import {formatDateTime} from "../../utils/formatDateTime";
 import {TYPE_ICONS} from "../../constants/eventsV2Types";
-
-const REGION_COLORS = {
-  EAST_ASIA_AND_PACIFIC: "bg-red-100 text-red-700",
-  EUROPE_AND_CENTRAL_ASIA: "bg-blue-100 text-blue-700",
-  LATIN_AMERICA_AND_CARIBBEAN: "bg-green-100 text-green-700",
-  MIDDLE_EAST_AND_NORTH_AFRICA: "bg-amber-100 text-amber-700",
-  NORTH_AMERICA: "bg-indigo-100 text-indigo-700",
-  SOUTH_ASIA: "bg-orange-100 text-orange-700",
-  SUB_SAHARAN_AFRICA: "bg-yellow-100 text-yellow-800"
-};
+import {safeHref} from "../../utils/safeHref";
 
 function EventsTableItemV2(props) {
   const statusColor = status => {
@@ -38,17 +30,17 @@ function EventsTableItemV2(props) {
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-0.5">
         <div className="font-bold">
-          {props.wikipediaUrl ? (
-            <a href={props.wikipediaUrl} target="_blank" rel="noreferrer" className="hover:underline">
+          {safeHref(props.wikipediaUrl) ? (
+            <a href={safeHref(props.wikipediaUrl)} target="_blank" rel="noreferrer" className="hover:underline">
               {props.name}
             </a>
           ) : (
             props.name
           )}
-          {props.wikidataUrl && (
+          {safeHref(props.wikidataUrl) && (
             <span className="ml-1 font-normal text-xs text-gray-400">
               (
-              <a href={props.wikidataUrl} target="_blank" rel="noreferrer" className="hover:underline">
+              <a href={safeHref(props.wikidataUrl)} target="_blank" rel="noreferrer" className="hover:underline">
                 {props.wikidataId}
               </a>
               )
@@ -93,5 +85,22 @@ function EventsTableItemV2(props) {
     </tr>
   );
 }
+
+EventsTableItemV2.propTypes = {
+  type: PropTypes.string,
+  wikidataId: PropTypes.string,
+  wikidataUrl: PropTypes.string,
+  wikipediaUrl: PropTypes.string,
+  name: PropTypes.string,
+  description: PropTypes.string,
+  status: PropTypes.string,
+  startDateTime: PropTypes.string,
+  endDateTime: PropTypes.string,
+  regions: PropTypes.arrayOf(PropTypes.string),
+  countries: PropTypes.arrayOf(PropTypes.shape({wikidataId: PropTypes.string, name: PropTypes.string})),
+  locations: PropTypes.arrayOf(
+    PropTypes.shape({wikidataId: PropTypes.string, name: PropTypes.string, coordinate: PropTypes.string})
+  )
+};
 
 export default EventsTableItemV2;

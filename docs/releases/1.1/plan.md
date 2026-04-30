@@ -746,42 +746,21 @@ Or switch the entire post-processing step to a single `node -e` or Python one-li
 
 ---
 
-#### 12.3 OpenAPI spec — remove `/v1/events` path and v1-only schemas
+#### 12.3 ~~OpenAPI spec — remove `/v1/events` path and v1-only schemas~~ *(no longer needed)*
 
-**File:** `scripts/openapi/openapi.yaml`
-
-**Remove the path:**
-```yaml
-paths:
-  /v1/events:       # ← delete this entire block (lines 21–78)
-    get: ...
-```
-
-**Remove the v1-only component schemas** (these are distinct from the `event_*` v2 schemas and are not referenced by any v2 path):
-
-| Schema to remove | Note |
-|---|---|
-| `EventListResponseBody` | V1 response wrapper; v2 uses `event_EventListResponseBody` |
-| `Event` | V1 event model; v2 uses `event_Event` |
-| `EventType` | V1 loose string type; v2 uses `event_EventType` (enum with pattern) |
-| `WikidataId` | V1 loose string; v2 uses `event_WikidataId` (pattern-constrained) |
-| `EventName` | V1 loose string; v2 uses `event_EventName` |
-| `EventTimeStateRelativeToNow` | V1 loose string; v2 uses `event_EventTimeStateRelativeToNow` (enum) |
-| `DateTime` | V1 loose format; v2 uses `event_DateTime` (strict ISO 8601) |
-
-**Keep everything else** — all `event_*` schemas, error schemas, pagination, and metadata schemas are used by v2 paths and must be retained.
+The upstream spec at `TempoGeoPoliticalMap/tgpm-openapi` was updated (pinned SHA `c7d0fed479f9c477682619b8d44b65966e0adbf0`) and no longer contains the `/v1/events` path or any v1-only schemas. Manual cleanup of `scripts/openapi/openapi.yaml` is therefore unnecessary — `make openapi` produces a v2-only `src/@generated/` automatically.
 
 ---
 
 #### 12.4 Regenerate `src/@generated/`
 
-After cleaning `openapi.yaml`, run:
+Run:
 
 ```bash
 make openapi
 ```
 
-This drops the generated TypeScript types for v1 models and ensures `src/@generated/` reflects the v2-only spec. Verify the diff: only the seven removed schemas should disappear from the generated output; no v2 type should change.
+The generated `src/@generated/` reflects the v2-only spec. Verify the diff contains no v2 type regressions and run `npm run build` to confirm.
 
 ---
 
@@ -902,8 +881,8 @@ Any remaining import of a deleted file surfaces immediately as a lint error. Res
 5. Item 11.4 (sed portability fix) — needed before CI runs openapi generation on Linux
 6. Item 8.1 (test infrastructure) — install framework and config before writing any tests
 7. Item 5 (CI workflow) + 8.7 (test job, includes `npm audit` gate) — wire all CI checks together; `--passWithNoTests` keeps CI green until the test suite lands
-8. **Items 2 + 12 together** — remove mock mode, v1 tabs, all v1 source files, and v1 from openapi spec in one commit; write item 8.4 page tests alongside
-9. Item 12.4 (`make openapi`) — regenerate `src/@generated/` immediately after the spec change
+8. **Items 2 + 12 together** — remove mock mode, v1 tabs, all v1 source files in one commit; write item 8.4 page tests alongside. Step 12.3 (manual spec cleanup) is superseded — the upstream spec (SHA `c7d0fed`) already excludes v1.
+9. Item 12.4 (`make openapi`) — regenerate `src/@generated/` from the pinned SHA; no manual spec edits needed
 10. **Item 13** — delete all 44 unused files (template components, unintegrated filters, dead utilities including `Transition.jsx` and `routerCompat.jsx`); run `npm run lint` to verify no dangling imports
 11. Item 11.1 (shared `useEventsV2` hook) — do after items 2+12 since view components become parent-only
 12. Item 11.2 (centralise REGION_COLORS) + 10.3 (fix interceptor) + 10.4 (standardise async) — mechanical refactors

@@ -1,17 +1,17 @@
 import axios from "axios";
-// import {ENV} from "@app/constants/env";
 
 /** Setup an API instance */
 export const axiosInstance = axios.create({
-  // baseURL: ENV.API_HOST,
-  baseURL: "https://api.tgpm.world/",
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "https://api.tgpm.world/",
   proxy: false,
-  withCredentials: false,
-  headers: {
-    "Content-Type": "application/json",
-    "cache-control": "no-cache",
-    "Access-Control-Allow-Origin": "*"
-  }
+  withCredentials: false
 });
 
-axiosInstance.interceptors.response.use(res => res);
+axiosInstance.interceptors.response.use(
+  res => res,
+  err => {
+    const status = err.response?.status;
+    const message = err.response?.data?.detail ?? err.message ?? "Unknown error";
+    return Promise.reject(new Error(status ? `[${status}] ${message}` : message));
+  }
+);
