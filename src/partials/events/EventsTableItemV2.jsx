@@ -28,7 +28,7 @@ function EventsTableItemV2(props) {
           <Tooltip title={TYPES[props.type]?.NAME ?? props.type}>{TYPE_ICONS[props.type] ?? props.type}</Tooltip>
         </div>
       </td>
-      <td className="px-2 first:pl-5 last:pr-5 py-0.5">
+      <td className="px-2 first:pl-5 last:pr-5 py-0.5 min-w-[400px]">
         <div className="font-bold">
           {safeHref(props.wikipediaUrl) ? (
             <a href={safeHref(props.wikipediaUrl)} target="_blank" rel="noreferrer" className="hover:underline">

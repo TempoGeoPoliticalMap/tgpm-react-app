@@ -92,8 +92,9 @@ The script:
 pages/index.js
   └── ErrorBoundary
         └── EventsV2
-              ├── useEventsV2()          — fetches GET /v2/events
-              ├── filterAndSortEventsV2  — client-side filter + sort
+              ├── useEventsV2({types, timeslotStart, timeslotEnd})
+              │     └── GET /v2/events?types=…&timeslot_start=…&timeslot_end=…
+              ├── filterAndSortEventsV2  — client-side sort (+ belt-and-suspenders filter)
               └── (activeView switch)
                     ├── EventsTableV2    — receives events[]
                     ├── EventsTimelineV2 — receives events[]
@@ -101,7 +102,7 @@ pages/index.js
                     └── EventsCompactV2  — receives events[] (embeds EventsMapV2)
 ```
 
-Filtering props (`typeFilter`, `fromDate`, `toDate`) originate in `pages/index.js` and flow down through `EventsV2` into `filterAndSortEventsV2`. View components receive the already-filtered `events` array and do no fetching of their own.
+Filter state (`selectedTypes`, `fromDate`, `toDate`) originates in `pages/index.js`. It is passed to `EventsV2`, which forwards it to `useEventsV2` as server-side query params. A change to any filter triggers a fresh API call. `filterAndSortEventsV2` still runs client-side for sorting and as a safety net. View components receive the already-filtered `events` array and do no fetching of their own.
 
 ## 7. Views
 
@@ -116,7 +117,17 @@ All view components are dynamically imported (`next/dynamic`, `ssr: false`) to a
 
 ## 8. Filtering
 
-`filterAndSortEventsV2(events, {typeFilter, statusFilter, regionFilter, fromDate, toDate})` is a pure function in `src/utils/`. Filters compose as AND conditions. `fromDate`/`toDate` are Day.js objects from Ant Design's `DatePicker`. The function is memoised inside `EventsV2` via `useMemo`.
+Filtering is primarily server-side. `useEventsV2` accepts `{types, timeslotStart, timeslotEnd}` and sends them as query params to `GET /v2/events`:
+
+| Param | API query param | Source |
+|---|---|---|
+| `types` | `types` (repeated) | `selectedTypes` state in `pages/index.js` |
+| `timeslotStart` | `timeslot_start` | `fromDate` Dayjs → `.startOf("day").toISOString()` |
+| `timeslotEnd` | `timeslot_end` | `toDate` Dayjs → `.endOf("day").toISOString()` |
+
+`fromDate` and `toDate` are independent `useState` values each backed by a separate Ant Design `DatePicker` (with its own clear button). They are passed directly to `EventsV2` as Dayjs objects or `null`.
+
+`filterAndSortEventsV2(events, {typeFilter, statusFilter, regionFilter, fromDate, toDate})` still runs client-side for sorting and as a belt-and-suspenders filter on the already-filtered API response. It is memoised inside `EventsV2` via `useMemo`.
 
 ## 9. Security
 

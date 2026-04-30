@@ -398,6 +398,10 @@ Use `renderHook` from `@testing-library/react`. MSW intercepts the network calls
 | After successful fetch: `loading` false, `events` populated | Happy path |
 | After network error: `loading` false, `error` is a string | Error state |
 | Unmount before fetch resolves: no state-update warning in console | `cancelled` flag prevents setState after unmount |
+| Called with `{types: ["WARFARE_AND_ARMED_CONFLICTS"]}`: API request includes `types=WARFARE_AND_ARMED_CONFLICTS` | Filter params forwarded to API |
+| Called with `{timeslotStart, timeslotEnd}`: API request includes those query params | Date filter params forwarded |
+| `types` prop changes: re-fetch is triggered with new params | Reactive refetch on filter change |
+| API response contains duplicate `wikidataId` entries: deduplicated in returned `events` | Deduplication guard |
 
 ---
 
@@ -640,18 +644,31 @@ This means all components catch a consistent `Error` with a human-readable messa
 import {useEffect, useState} from "react";
 import {axiosInstance} from "../api/api";
 
-export function useEventsV2() {
+export function useEventsV2({types = [], timeslotStart = null, timeslotEnd = null} = {}) {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const typesKey = [...types].sort().join("\0");
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+
+    const resolvedTypes = typesKey ? typesKey.split("\0") : [];
+    const params = {};
+    if (resolvedTypes.length) params.types = resolvedTypes;
+    if (timeslotStart) params.timeslot_start = timeslotStart;
+    if (timeslotEnd) params.timeslot_end = timeslotEnd;
+
     (async () => {
       try {
-        const {data} = await axiosInstance.get("v2/events");
-        if (!cancelled) { setEvents(data.data); setError(null); }
+        const {data} = await axiosInstance.get("v2/events", {params});
+        if (!cancelled) {
+          const seen = new Set();
+          setEvents(data.data.filter(e => !seen.has(e.wikidataId) && seen.add(e.wikidataId)));
+          setError(null);
+        }
       } catch (err) {
         if (!cancelled) setError(err.message);
       } finally {
@@ -659,11 +676,13 @@ export function useEventsV2() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [typesKey, timeslotStart, timeslotEnd]);
 
   return {events, loading, error};
 }
 ```
+
+> The `typesKey` serialisation (`sort().join("\0")`) converts the `types` array to a stable primitive so the `useEffect` dependency array does not trigger on every render from a new array reference. The hook also deduplicates events by `wikidataId` on receipt, guarding against duplicate keys in the API response.
 
 **Refactor:**
 - `EventsV2.jsx` — replace its inline fetch with `useEventsV2()`
@@ -840,7 +859,7 @@ These three components were written specifically for this app (not template code
 |---|---|---|
 | `src/partials/events/EventRegionFilterV2.jsx` | Multi-select dropdown for filtering by world region | Region filter not exposed in the UI; `filterAndSortEventsV2` supports it but `pages/index.js` never passes a `regionFilter` |
 | `src/partials/events/EventStatusFilterV2.jsx` | Multi-select dropdown for filtering by PAST / ONGOING / FUTURE | Status filter not exposed in the UI; same situation |
-| `src/partials/events/EventTimeframeFilterV2.jsx` | Two separate `DatePicker` inputs for from/to date | Superseded by Ant Design's `RangePicker` used directly in `pages/index.js` |
+| `src/partials/events/EventTimeframeFilterV2.jsx` | Two separate `DatePicker` inputs for from/to date | Superseded by two independent Ant Design `DatePicker` components wired directly in `pages/index.js`, each with its own clear button |
 
 **Decision:** Delete all three. They are dead code today. If region/status filtering is added in a future release, it should be re-implemented on top of the then-current UI conventions rather than resurrecting stale standalone components.
 

@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Head from "next/head";
 import {DatePicker} from "antd";
 
@@ -6,8 +6,6 @@ import MinimalHeader from "../src/components/MinimalHeader";
 import EventsV2 from "../src/components/events/EventsV2";
 import {ErrorBoundary} from "../src/components/ErrorBoundary";
 import EventTypeLegendV2 from "../src/partials/events/EventTypeLegendV2";
-
-const {RangePicker} = DatePicker;
 
 const STORAGE_KEY = "tgpm-header-collapsed";
 
@@ -21,11 +19,14 @@ const VIEWS = [
 function Home() {
   const [activeView, setActiveView] = useState("table");
   const [selectedTypes, setSelectedTypes] = useState([]);
-  const [dateRange, setDateRange] = useState([null, null]);
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(STORAGE_KEY) === "true";
-  });
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (localStorage.getItem(STORAGE_KEY) === "true") setCollapsed(true);
+  }, []);
 
   const onCollapse = () => {
     setCollapsed(prev => {
@@ -35,19 +36,11 @@ function Home() {
     });
   };
 
-  const fromDate = dateRange[0] ?? null;
-  const toDate = dateRange[1] ?? null;
-
   const filtersNode = (
     <>
       <EventTypeLegendV2 selectedTypes={selectedTypes} onChange={setSelectedTypes} />
-      <RangePicker
-        value={dateRange}
-        onChange={dates => setDateRange(dates ?? [null, null])}
-        allowEmpty={[true, true]}
-        placeholder={["From date", "To date"]}
-        style={{width: 176}}
-      />
+      <DatePicker value={fromDate} onChange={setFromDate} placeholder="From date" allowClear style={{width: 121}} />
+      <DatePicker value={toDate} onChange={setToDate} placeholder="To date" allowClear style={{width: 121}} />
     </>
   );
 

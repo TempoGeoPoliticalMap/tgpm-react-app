@@ -141,24 +141,23 @@ function MinimalHeader({filtersNode, activeView, onViewChange, views = [], colla
             )}
           </div>
 
-          {/* Collapse toggle */}
-          <button
-            onClick={onCollapse}
-            className="ml-1 flex items-center gap-1 text-white text-sm font-semibold px-3 py-1 rounded hover:bg-white/10 transition-colors"
-            aria-label={collapsed ? "Expand header" : "Collapse header"}>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{
-                transform: collapsed ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform 0.25s ease"
-              }}>
-              <path d="M2 5L7 10L12 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+          {/* Collapse toggle — only in nav when collapsed */}
+          {collapsed && (
+            <button
+              onClick={onCollapse}
+              className="ml-1 flex items-center gap-1 text-white text-sm font-semibold px-3 py-1 rounded hover:bg-white/10 transition-colors"
+              aria-label="Expand header">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{transform: "rotate(180deg)"}}>
+                <path d="M2 5L7 10L12 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )}
         </nav>
       </div>
 
@@ -188,6 +187,16 @@ function MinimalHeader({filtersNode, activeView, onViewChange, views = [], colla
             {filtersNode}
           </div>
         )}
+
+        {/* Collapse toggle — at bottom-right edge when expanded */}
+        <button
+          onClick={onCollapse}
+          className="absolute bottom-0 right-6 translate-y-1/2 flex items-center justify-center bg-white rounded shadow-xl px-3 py-2 z-30 hover:bg-gray-50 transition-colors"
+          aria-label="Collapse header">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 9L7 4L12 9" stroke="#374151" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
     </header>
   );

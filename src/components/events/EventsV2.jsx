@@ -27,7 +27,11 @@ const EventsCompactV2 = dynamic(() => import("../../partials/events/EventsCompac
 });
 
 function EventsV2({mockData, activeView = "table", typeFilter = [], fromDate = null, toDate = null}) {
-  const live = useEventsV2();
+  const live = useEventsV2({
+    types: typeFilter,
+    timeslotStart: fromDate ? fromDate.startOf("day").toISOString() : null,
+    timeslotEnd: toDate ? toDate.endOf("day").toISOString() : null
+  });
 
   const rawEvents = mockData ? mockData.data : live.events;
   const loading = mockData ? false : live.loading;

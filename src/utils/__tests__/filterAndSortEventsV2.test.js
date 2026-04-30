@@ -71,22 +71,22 @@ describe("filterAndSortEventsV2", () => {
     expect(filterAndSortEventsV2(events, {...noFilter, regionFilter: ["NORTH_AMERICA"]})).toHaveLength(0);
   });
 
-  test("output is sorted by startDateTime ascending", () => {
+  test("output is sorted by startDateTime descending", () => {
     const events = [
-      makeEvent({wikidataId: "Q2", startDateTime: "2023-01-01T00:00:00Z"}),
-      makeEvent({wikidataId: "Q1", startDateTime: "2020-01-01T00:00:00Z"})
+      makeEvent({wikidataId: "Q1", startDateTime: "2020-01-01T00:00:00Z"}),
+      makeEvent({wikidataId: "Q2", startDateTime: "2023-01-01T00:00:00Z"})
     ];
     const result = filterAndSortEventsV2(events, noFilter);
-    expect(result[0].wikidataId).toBe("Q1");
+    expect(result[0].wikidataId).toBe("Q2");
   });
 
-  test("events with equal startDateTime sorted by endDateTime", () => {
+  test("events with equal startDateTime sorted by endDateTime descending", () => {
     const events = [
-      makeEvent({wikidataId: "Q2", startDateTime: "2020-01-01T00:00:00Z", endDateTime: "2022-01-01T00:00:00Z"}),
-      makeEvent({wikidataId: "Q1", startDateTime: "2020-01-01T00:00:00Z", endDateTime: "2021-01-01T00:00:00Z"})
+      makeEvent({wikidataId: "Q1", startDateTime: "2020-01-01T00:00:00Z", endDateTime: "2021-01-01T00:00:00Z"}),
+      makeEvent({wikidataId: "Q2", startDateTime: "2020-01-01T00:00:00Z", endDateTime: "2022-01-01T00:00:00Z"})
     ];
     const result = filterAndSortEventsV2(events, noFilter);
-    expect(result[0].wikidataId).toBe("Q1");
+    expect(result[0].wikidataId).toBe("Q2");
   });
 
   test("input array is not mutated", () => {
