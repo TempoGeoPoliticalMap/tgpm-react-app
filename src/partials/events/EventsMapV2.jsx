@@ -71,10 +71,22 @@ function EventsMapV2({events = []}) {
 
   // Fetch country GeoJSON (cached by browser after first load)
   React.useEffect(() => {
-    fetch(GEOJSON_URL)
-      .then(r => r.json())
-      .then(setGeoData)
-      .catch(() => {});
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const r = await fetch(GEOJSON_URL);
+        const data = await r.json();
+
+        if (!cancelled) setGeoData(data);
+      } catch {
+        // ignore — map renders without country shading
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // ISO → accumulated fill opacity (0.1 per event, max 0.5)

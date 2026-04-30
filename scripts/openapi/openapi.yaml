@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: TempoGeoPolitical Map RESTful API
   description: API for querying historical political events and metadata filter values.
-  version: 1.0.0
+  version: 1.1.0
   contact:
     name: TempoGeoPolitical Map API Team
 servers:

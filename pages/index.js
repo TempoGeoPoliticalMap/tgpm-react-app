@@ -24,8 +24,12 @@ function Home() {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (localStorage.getItem(STORAGE_KEY) === "true") setCollapsed(true);
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (localStorage.getItem(STORAGE_KEY) === "true") setCollapsed(true);
+    } catch {
+      // localStorage unavailable (e.g. private-browsing restriction)
+    }
   }, []);
 
   const onCollapse = () => {
