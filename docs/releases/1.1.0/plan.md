@@ -76,8 +76,6 @@ This release cleans up the data-mode UX (live-only), fixes the broken live API c
 | `package.json` | `version` | `0.2.0` | `1.1.0` |
 | `scripts/openapi/openapi.yaml` | `info.version` | `0.2.0` | `1.1.0` |
 
-Also create `CHANGELOG.md` at the repo root with a `## [1.1.0]` section summarising what changed in this release. This is the first versioned changelog entry; subsequent releases should prepend to it.
-
 ---
 
 ### 5. CI: version-bump gate

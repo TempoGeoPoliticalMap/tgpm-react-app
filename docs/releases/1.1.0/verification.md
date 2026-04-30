@@ -42,7 +42,6 @@
 ### 4. Version bump to 1.1.0
 **✅ Done.**  
 - `package.json` version: **1.1.0** ✅  
-- `CHANGELOG.md` created with a `## [1.1.0]` section ✅  
 - `scripts/openapi/openapi.yaml` `info.version`: bumped to **1.1.0** ✅
 
 ---
