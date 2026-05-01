@@ -6,12 +6,12 @@ export function filterAndSortEventsV2(events, {typeFilter, statusFilter, regionF
     .filter(e => !fromDate || !e.endDateTime || fromDate.isBefore(e.endDateTime, "day"))
     .filter(e => !toDate || toDate.isAfter(e.startDateTime, "day"))
     .sort((a, b) => {
-      const startDiff = new Date(a.startDateTime) - new Date(b.startDateTime);
+      const startDiff = new Date(b.startDateTime) - new Date(a.startDateTime);
 
       if (startDiff !== 0) return startDiff;
-      const aEnd = a.endDateTime ? new Date(a.endDateTime) : Infinity;
-      const bEnd = b.endDateTime ? new Date(b.endDateTime) : Infinity;
+      const aEnd = a.endDateTime ? new Date(a.endDateTime) : -Infinity;
+      const bEnd = b.endDateTime ? new Date(b.endDateTime) : -Infinity;
 
-      return aEnd - bEnd;
+      return bEnd - aEnd;
     });
 }

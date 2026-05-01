@@ -1,56 +1,9 @@
-import React, {useEffect, useMemo, useState} from "react";
-
-import {axiosInstance} from "../../api/api";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import {filterAndSortEventsV2} from "../../utils/filterAndSortEventsV2";
+import React from "react";
+import PropTypes from "prop-types";
 
 import EventsTableItemV2 from "./EventsTableItemV2";
 
-function EventsTableV2({data, typeFilter, statusFilter, regionFilter, fromDate, toDate, events}) {
-  const [eventsList, setEventsList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (events) {
-      setError(null);
-      setLoading(false);
-      return;
-    }
-
-    if (data) {
-      setEventsList(data.data);
-      setError(null);
-      setTimeout(() => setLoading(false), 500);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    const fetchEvents = async () => {
-      try {
-        let response = await axiosInstance.get("v2/events");
-
-        if (!cancelled) setEventsList(response.data.data);
-      } catch (err) {
-        if (!cancelled) setError("Failed to load events. Please try again later.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    fetchEvents();
-    return () => {
-      cancelled = true;
-    };
-  }, [data, events]);
-
-  const filteredEvents = useMemo(() => {
-    if (events) return events;
-    return filterAndSortEventsV2(eventsList, {typeFilter, statusFilter, regionFilter, fromDate, toDate});
-  }, [events, eventsList, typeFilter, statusFilter, regionFilter, fromDate, toDate]);
-
-  if (loading) return <LoadingSpinner />;
-  if (error) return <div className="p-5 text-red-500">{error}</div>;
-
+function EventsTableV2({events = []}) {
   return (
     <div className="bg-white">
       <div>
@@ -76,16 +29,16 @@ function EventsTableV2({data, typeFilter, statusFilter, regionFilter, fromDate, 
                 <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                   <div className="font-semibold text-left">Regions</div>
                 </th>
-                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-32">
                   <div className="font-semibold text-left">Countries</div>
                 </th>
-                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-32">
                   <div className="font-semibold text-left">Locations</div>
                 </th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-slate-200 border-b border-slate-200">
-              {filteredEvents.map(event => (
+              {events.map(event => (
                 <EventsTableItemV2
                   key={event.wikidataId}
                   type={event.type}
@@ -109,5 +62,9 @@ function EventsTableV2({data, typeFilter, statusFilter, regionFilter, fromDate, 
     </div>
   );
 }
+
+EventsTableV2.propTypes = {
+  events: PropTypes.arrayOf(PropTypes.object)
+};
 
 export default EventsTableV2;

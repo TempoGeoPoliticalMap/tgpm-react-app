@@ -16,6 +16,8 @@ Command format: `npm run <command>`
 | `npm run start` | Start a Next.js production server |
 | `npm run lint` | Run ESLint |
 | `npm run lint:fix` | Auto-fix lint errors |
+| `npm test` | Run the test suite |
+| `npm run test:coverage` | Run tests with coverage report |
 
 ## Deployment
 

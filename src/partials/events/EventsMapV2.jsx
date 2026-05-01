@@ -1,12 +1,12 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useCallback, useMemo, useState} from "react";
+import PropTypes from "prop-types";
 import L from "leaflet";
 import {GeoJSON, MapContainer, Marker, Popup, TileLayer, useMapEvents} from "react-leaflet";
 
-import {axiosInstance} from "../../api/api";
-import LoadingSpinner from "../../components/LoadingSpinner";
 import {STATUSES, TYPES} from "../../constants/eventsV2Types";
 import {formatDateTime} from "../../utils/formatDateTime";
 import {TYPE_ICONS} from "../../constants/eventsV2Types";
+import {safeHref} from "../../utils/safeHref";
 
 // world.geo.json — ~360 KB, feature.id is ISO alpha-3
 const GEOJSON_URL = "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json";
@@ -31,6 +31,17 @@ const STATUS_MARKER_COLOR = {
   FUTURE: "#94a3b8"
 };
 
+function parseCoordinate(coordinate) {
+  const parts = coordinate.split(",");
+
+  if (parts.length !== 2 || !parts[0].trim() || !parts[1].trim()) return null;
+  const [lat, lng] = parts.map(Number);
+
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+  return [lat, lng];
+}
+
 const createMarkerIcon = (status, highlighted) => {
   const size = highlighted ? 18 : 12;
   const color = STATUS_MARKER_COLOR[status] ?? "#64748b";
@@ -49,69 +60,39 @@ function MapClickHandler({onMapClick}) {
   return null;
 }
 
-function EventsMapV2({data, typeFilter, statusFilter, regionFilter, fromDate, toDate}) {
-  const [eventsList, setEventsList] = useState([]);
-  const [loading, setLoading] = useState(() => !data);
-  const [error, setError] = useState(null);
+MapClickHandler.propTypes = {
+  onMapClick: PropTypes.func.isRequired
+};
+
+function EventsMapV2({events = []}) {
   const [geoData, setGeoData] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [selectedCountryIso, setSelectedCountryIso] = useState(null);
 
-  // Fetch events
-  useEffect(() => {
-    if (data) return;
+  // Fetch country GeoJSON (cached by browser after first load)
+  React.useEffect(() => {
     let cancelled = false;
-    axiosInstance
-      .get("v2/events")
-      .then(r => {
-        if (!cancelled) setEventsList(r.data.data);
-      })
-      .catch(() => {
-        if (!cancelled) setError("Failed to load events. Please try again later.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+
+    (async () => {
+      try {
+        const r = await fetch(GEOJSON_URL);
+        const data = await r.json();
+
+        if (!cancelled) setGeoData(data);
+      } catch {
+        // ignore — map renders without country shading
+      }
+    })();
+
     return () => {
       cancelled = true;
     };
-  }, [data]);
-
-  const eventsSource = data?.data ?? eventsList;
-
-  // Fetch country GeoJSON (cached by browser after first load)
-  useEffect(() => {
-    fetch(GEOJSON_URL)
-      .then(r => r.json())
-      .then(setGeoData)
-      .catch(() => {});
   }, []);
-
-  // Filter + sort (identical to table and timeline)
-  const filtered = useMemo(
-    () =>
-      eventsSource
-        .filter(e => !typeFilter?.length || typeFilter.includes(e.type))
-        .filter(e => !statusFilter?.length || statusFilter.includes(e.timeStateRelativeToNow))
-        .filter(e => !regionFilter?.length || e.regions?.some(r => regionFilter.includes(r)))
-        .filter(e => !fromDate || !e.endDateTime || fromDate.isBefore(e.endDateTime, "day"))
-        .filter(e => !toDate || toDate.isAfter(e.startDateTime, "day"))
-        .sort((a, b) => {
-          const d = new Date(a.startDateTime) - new Date(b.startDateTime);
-
-          if (d !== 0) return d;
-          const aEnd = a.endDateTime ? new Date(a.endDateTime) : Infinity;
-          const bEnd = b.endDateTime ? new Date(b.endDateTime) : Infinity;
-
-          return aEnd - bEnd;
-        }),
-    [eventsSource, typeFilter, statusFilter, regionFilter, fromDate, toDate]
-  );
 
   // ISO → accumulated fill opacity (0.1 per event, max 0.5)
   const countryOpacity = useMemo(() => {
     const map = {};
-    filtered.forEach(event => {
+    events.forEach(event => {
       event.countries?.forEach(c => {
         const iso = WIKIDATA_TO_ISO[c.wikidataId];
 
@@ -119,25 +100,25 @@ function EventsMapV2({data, typeFilter, statusFilter, regionFilter, fromDate, to
       });
     });
     return map;
-  }, [filtered]);
+  }, [events]);
 
   // ISOs of countries belonging to the currently selected event
   const selectedEventIsos = useMemo(() => {
     if (!selectedEventId) return new Set();
-    const event = filtered.find(e => e.wikidataId === selectedEventId);
+    const event = events.find(e => e.wikidataId === selectedEventId);
 
     return new Set(event?.countries?.map(c => WIKIDATA_TO_ISO[c.wikidataId]).filter(Boolean));
-  }, [selectedEventId, filtered]);
+  }, [selectedEventId, events]);
 
   // Event IDs that involve the currently selected country
   const selectedCountryEventIds = useMemo(() => {
     if (!selectedCountryIso) return new Set();
     return new Set(
-      filtered
+      events
         .filter(e => e.countries?.some(c => WIKIDATA_TO_ISO[c.wikidataId] === selectedCountryIso))
         .map(e => e.wikidataId)
     );
-  }, [selectedCountryIso, filtered]);
+  }, [selectedCountryIso, events]);
 
   const geoStyle = useCallback(
     feature => {
@@ -168,9 +149,6 @@ function EventsMapV2({data, typeFilter, statusFilter, regionFilter, fromDate, to
   // Key forces GeoJSON layer to re-style when selection changes
   const geoKey = `${selectedEventId ?? "none"}-${selectedCountryIso ?? "none"}`;
 
-  if (!data && loading) return <LoadingSpinner />;
-  if (!data && error) return <div className="p-5 text-red-500">{error}</div>;
-
   return (
     <MapContainer center={[20, 10]} zoom={2} style={{height: "600px", width: "100%"}}>
       <MapClickHandler
@@ -187,15 +165,17 @@ function EventsMapV2({data, typeFilter, statusFilter, regionFilter, fromDate, to
 
       {geoData && <GeoJSON key={geoKey} data={geoData} style={geoStyle} onEachFeature={onEachCountry} />}
 
-      {filtered.flatMap(event =>
+      {events.flatMap(event =>
         (event.locations ?? []).map(location => {
-          const [lat, lng] = location.coordinate.split(",").map(Number);
+          const coords = parseCoordinate(location.coordinate);
+
+          if (!coords) return null;
           const highlighted = event.wikidataId === selectedEventId || selectedCountryEventIds.has(event.wikidataId);
 
           return (
             <Marker
               key={`${event.wikidataId}-${location.wikidataId}`}
-              position={[lat, lng]}
+              position={coords}
               icon={createMarkerIcon(event.timeStateRelativeToNow, highlighted)}
               eventHandlers={{
                 click: e => {
@@ -208,17 +188,25 @@ function EventsMapV2({data, typeFilter, statusFilter, regionFilter, fromDate, to
                 <div className="text-sm space-y-1">
                   <div className="flex items-center gap-1.5 font-bold">
                     <span className="text-base">{TYPE_ICONS[event.type]}</span>
-                    {event.wikipediaUrl ? (
-                      <a href={event.wikipediaUrl} target="_blank" rel="noreferrer" className="hover:underline">
+                    {safeHref(event.wikipediaUrl) ? (
+                      <a
+                        href={safeHref(event.wikipediaUrl)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline">
                         {event.name}
                       </a>
                     ) : (
                       event.name
                     )}
-                    {event.wikidataUrl && (
+                    {safeHref(event.wikidataUrl) && (
                       <span className="font-normal text-xs text-gray-400">
                         (
-                        <a href={event.wikidataUrl} target="_blank" rel="noreferrer" className="hover:underline">
+                        <a
+                          href={safeHref(event.wikidataUrl)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:underline">
                           {event.wikidataId}
                         </a>
                         )
@@ -246,5 +234,9 @@ function EventsMapV2({data, typeFilter, statusFilter, regionFilter, fromDate, to
     </MapContainer>
   );
 }
+
+EventsMapV2.propTypes = {
+  events: PropTypes.arrayOf(PropTypes.object)
+};
 
 export default EventsMapV2;

@@ -2,11 +2,15 @@
 
 # !!!RUN THIS SCRIPT FROM THE ROOT!!!
 
-# download latest api spec from GitHub
-curl -X GET "https://raw.githubusercontent.com/TempoGeoPoliticalMap/tgpm-openapi/refs/heads/main/openapi.bundled.yaml" > scripts/openapi/openapi.yaml
+set -e
+
+source config.env
+
+# download pinned api spec from GitHub
+curl -X GET "https://raw.githubusercontent.com/TempoGeoPoliticalMap/tgpm-openapi/${SPEC_SHA}/openapi.bundled.yaml" > scripts/openapi/openapi.yaml
 
 # make global params optional
-sed -i '' '/Accept/,/required/ s/true/false/g' scripts/openapi/openapi.yaml
+sed -i.bak '/Accept/,/required/ s/true/false/g' scripts/openapi/openapi.yaml && rm -f scripts/openapi/openapi.yaml.bak
 
 # remove old @generated folder
 rm -rf src/@generated
@@ -18,3 +22,6 @@ npx openapi-generator-cli generate -i scripts/openapi/openapi.yaml -g typescript
 
 # search and replace enums in the generated files
 sed -n 's/^export enum\ \([a-zA-Z0-9]*\)Def {/sed -i '"'"''"'"' '"'"'s\/\1Def\/\1Enum\/g'"'"' src\/\@generated\/*.ts/p' src/@generated/*.ts | bash
+
+# remove generated push helper (not needed in this repo)
+rm -f src/@generated/git_push.sh

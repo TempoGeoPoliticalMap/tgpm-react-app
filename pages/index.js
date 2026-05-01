@@ -1,15 +1,11 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Head from "next/head";
 import {DatePicker} from "antd";
 
 import MinimalHeader from "../src/components/MinimalHeader";
-import EventsV1 from "../src/components/events/EventsV1";
 import EventsV2 from "../src/components/events/EventsV2";
+import {ErrorBoundary} from "../src/components/ErrorBoundary";
 import EventTypeLegendV2 from "../src/partials/events/EventTypeLegendV2";
-import {mockEventsV1} from "../src/partials/events/mockEventsV1";
-import {mockEventsV2} from "../src/partials/events/mockEventsV2";
-
-const {RangePicker} = DatePicker;
 
 const STORAGE_KEY = "tgpm-header-collapsed";
 
@@ -21,14 +17,20 @@ const VIEWS = [
 ];
 
 function Home() {
-  const [activeTab, setActiveTab] = useState("v2-mock");
   const [activeView, setActiveView] = useState("table");
   const [selectedTypes, setSelectedTypes] = useState([]);
-  const [dateRange, setDateRange] = useState([null, null]);
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(STORAGE_KEY) === "true";
-  });
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (localStorage.getItem(STORAGE_KEY) === "true") setCollapsed(true);
+    } catch {
+      // localStorage unavailable (e.g. private-browsing restriction)
+    }
+  }, []);
 
   const onCollapse = () => {
     setCollapsed(prev => {
@@ -38,53 +40,13 @@ function Home() {
     });
   };
 
-  const fromDate = dateRange[0] ?? null;
-  const toDate = dateRange[1] ?? null;
-
   const filtersNode = (
     <>
       <EventTypeLegendV2 selectedTypes={selectedTypes} onChange={setSelectedTypes} />
-      <RangePicker
-        value={dateRange}
-        onChange={dates => setDateRange(dates ?? [null, null])}
-        allowEmpty={[true, true]}
-        placeholder={["From date", "To date"]}
-        style={{width: 176}}
-      />
+      <DatePicker value={fromDate} onChange={setFromDate} placeholder="From date" allowClear style={{width: 121}} />
+      <DatePicker value={toDate} onChange={setToDate} placeholder="To date" allowClear style={{width: 121}} />
     </>
   );
-
-  const renderTab = () => {
-    switch (activeTab) {
-      case "v1-live":
-        return <EventsV1 key="v1-live" />;
-      case "v1-mock":
-        return <EventsV1 key="v1-mock" mockData={mockEventsV1} />;
-      case "v2-live":
-        return (
-          <EventsV2
-            key="v2-live"
-            activeView={activeView}
-            typeFilter={selectedTypes}
-            fromDate={fromDate}
-            toDate={toDate}
-          />
-        );
-      case "v2-mock":
-        return (
-          <EventsV2
-            key="v2-mock"
-            activeView={activeView}
-            mockData={mockEventsV2}
-            typeFilter={selectedTypes}
-            fromDate={fromDate}
-            toDate={toDate}
-          />
-        );
-      default:
-        return null;
-    }
-  };
 
   return (
     <>
@@ -93,8 +55,6 @@ function Home() {
       </Head>
       <div className="flex flex-col min-h-screen overflow-hidden bg-white">
         <MinimalHeader
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
           filtersNode={filtersNode}
           activeView={activeView}
           onViewChange={setActiveView}
@@ -103,7 +63,9 @@ function Home() {
           onCollapse={onCollapse}
         />
         <main className="grow" style={{paddingTop: collapsed ? 0 : "36px"}}>
-          {renderTab()}
+          <ErrorBoundary>
+            <EventsV2 activeView={activeView} typeFilter={selectedTypes} fromDate={fromDate} toDate={toDate} />
+          </ErrorBoundary>
         </main>
       </div>
     </>

@@ -2,11 +2,11 @@ openapi: 3.0.3
 info:
   title: TempoGeoPolitical Map RESTful API
   description: API for querying historical political events and metadata filter values.
-  version: 0.2.0
+  version: 1.1.0
   contact:
     name: TempoGeoPolitical Map API Team
 servers:
-  - url: https://tgpm.world
+  - url: https://api.tgpm.world
     description: Production
   - url: http://localhost:8080
     description: Local development
@@ -18,64 +18,6 @@ tags:
   - name: Metadata
     description: Reference data and filter values for API clients.
 paths:
-  /v1/events:
-    get:
-      operationId: v1_events_get
-      summary: List of Historical Political Events.
-      description: Returns a list of historical political events for API v1.
-      tags:
-        - Events
-      parameters:
-        - $ref: "#/components/parameters/Accept"
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EventListResponseBody"
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error400"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error401"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error403"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error404"
-        "406":
-          description: Not Acceptable
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error406"
-        "429":
-          description: Too Many Requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error429"
-        default:
-          description: Unsuccessful Operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BasicErrorObject"
   /v2/events:
     get:
       operationId: v2_events_get
@@ -98,7 +40,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/event_EventListResponseBody"
+                $ref: "#/components/schemas/EventListResponseBody"
         "400":
           description: Bad request
           content:
@@ -364,7 +306,7 @@ components:
       schema:
         type: array
         items:
-          $ref: "#/components/schemas/event_EventType"
+          $ref: "#/components/schemas/EventType"
         minItems: 0
         maxItems: 1000
         example:
@@ -413,7 +355,7 @@ components:
       description: Timeslot start date-time in UTC (ISO 8601) to filter by.
       required: false
       schema:
-        $ref: "#/components/schemas/event_DateTime"
+        $ref: "#/components/schemas/DateTime"
       example: "2022-05-01T00:00:00Z"
     TimeslotEndDateQueryParameter:
       name: timeslot_end
@@ -421,7 +363,7 @@ components:
       description: Timeslot end date-time in UTC (ISO 8601) to filter by.
       required: false
       schema:
-        $ref: "#/components/schemas/event_DateTime"
+        $ref: "#/components/schemas/DateTime"
       example: "2022-05-30T18:20:00Z"
     CountryCodeSearchQueryParameter:
       name: q
@@ -435,6 +377,272 @@ components:
         pattern: ^.*\S.*$
       example: united
   schemas:
+    EventType:
+      type: string
+      description: Type of an Event.
+      minLength: 3
+      maxLength: 100
+      pattern: ^[A-Z][A-Z0-9_]*$
+      enum:
+        - GEOPOLITICAL_GROUP
+        - INTERNATIONAL_ORGANISATION
+        - MILITARY_ALLIANCE
+        - MULTINATIONAL_MILITARY_COALITION
+        - POLITICAL_CONFERENCE
+        - POLITICAL_CRISIS
+        - POLITICAL_MURDER
+        - SOURCE_OF_INTERNATIONAL_LAW
+        - SUPRANATIONAL_UNION
+        - WARFARE_AND_ARMED_CONFLICTS
+      x-enumDescriptions:
+        GEOPOLITICAL_GROUP: Political grouping of states with shared geopolitical interests.
+        INTERNATIONAL_ORGANISATION: Intergovernmental organisation operating across multiple countries.
+        MILITARY_ALLIANCE: Formal military alliance between states.
+        MULTINATIONAL_MILITARY_COALITION: Coalition of multiple countries formed for military operations.
+        POLITICAL_CONFERENCE: Formal political conference involving state or institutional actors.
+        POLITICAL_CRISIS: Significant political instability or confrontation.
+        POLITICAL_MURDER: Politically motivated assassination or killing.
+        SOURCE_OF_INTERNATIONAL_LAW: Treaty, convention, or other recognised source of international law.
+        SUPRANATIONAL_UNION: Union in which member states delegate authority to shared institutions.
+        WARFARE_AND_ARMED_CONFLICTS: Armed hostilities, military operations, and violent conflict between organised actors.
+    Region:
+      type: string
+      description: World Region.
+      minLength: 10
+      maxLength: 40
+      pattern: ^[A-Z_]+$
+      enum:
+        - EAST_ASIA_AND_PACIFIC
+        - EUROPE_AND_CENTRAL_ASIA
+        - LATIN_AMERICA_AND_CARIBBEAN
+        - MIDDLE_EAST_AND_NORTH_AFRICA
+        - NORTH_AMERICA
+        - SOUTH_ASIA
+        - SUB_SAHARAN_AFRICA
+      x-enumDescriptions:
+        EAST_ASIA_AND_PACIFIC: Countries in East Asia, Southeast Asia, and Pacific island regions.
+        EUROPE_AND_CENTRAL_ASIA: Countries in Europe and Central Asia.
+        LATIN_AMERICA_AND_CARIBBEAN: Countries in Latin America and Caribbean regions.
+        MIDDLE_EAST_AND_NORTH_AFRICA: Countries in the Middle East and North Africa.
+        NORTH_AMERICA: Countries in North America.
+        SOUTH_ASIA: Countries in South Asia.
+        SUB_SAHARAN_AFRICA: Countries in Sub-Saharan Africa.
+    DateTime:
+      type: string
+      description: Event timestamp in UTC using ISO 8601 date-time format.
+      minLength: 20
+      maxLength: 35
+      format: date-time
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$
+      example: "2011-03-15T00:00:00Z"
+    WikidataId:
+      type: string
+      description: Wikidata entity ID (e.g., Q178810).
+      minLength: 2
+      maxLength: 32
+      pattern: ^Q[1-9][0-9]*$
+      example: Q178810
+    WikidataUrl:
+      type: string
+      description: URL of the corresponding Wikidata item.
+      minLength: 27
+      maxLength: 120
+      format: uri
+      pattern: ^https?://(www\.)?wikidata\.org/wiki/Q[1-9][0-9]*$
+      example: https://www.wikidata.org/wiki/Q178810
+    EventName:
+      type: string
+      description: Name of a historical political Event.
+      minLength: 1
+      maxLength: 200
+      pattern: ^.*\S.*$
+      example: Syrian Civil War
+    EventDescription:
+      type: string
+      description: Detailed information about a historical political Event.
+      minLength: 1
+      maxLength: 5000
+      pattern: ^.*\S.*$
+      example: "The Syrian civil war is an ongoing multi-sided civil war in Syria fought between the Ba'athist Syrian Arab Republic led by Syrian President Bashar al-Assad, along with domestic and foreign allies, and various domestic and foreign forces opposing both the Syrian government and each other in varying combinations. The war is currently the second deadliest of the 21st century. "
+    WikipediaUrl:
+      type: string
+      description: URL of the corresponding Wikipedia article.
+      minLength: 24
+      maxLength: 300
+      format: uri
+      pattern: ^https?://([a-z]{2,3}\.)?wikipedia\.org/wiki/.+$
+      example: https://en.wikipedia.org/wiki/Syrian_civil_war
+    EventImageUrl:
+      type: string
+      description: URL of an image representing the event.
+      minLength: 12
+      maxLength: 500
+      format: uri
+      pattern: ^https?://.+$
+      example: https://upload.wikimedia.org/example/event-image.jpg
+    RegionList:
+      type: array
+      description: List of World Regions to filter Events.
+      items:
+        $ref: "#/components/schemas/Region"
+      minItems: 0
+      maxItems: 10
+    Country:
+      type: object
+      description: Information about a Country related to the Event.
+      properties:
+        wikidataId:
+          allOf:
+            - $ref: "#/components/schemas/WikidataId"
+            - example: Q858
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+          pattern: ^.*\S.*$
+          example: Syria
+      required:
+        - wikidataId
+        - name
+    CountryList:
+      type: array
+      description: List of Countries related to the Event.
+      items:
+        $ref: "#/components/schemas/Country"
+      minItems: 0
+      maxItems: 200
+    Location:
+      type: object
+      description: Information about a Location related to the Event.
+      properties:
+        wikidataId:
+          allOf:
+            - $ref: "#/components/schemas/WikidataId"
+            - example: Q858
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+          pattern: ^.*\S.*$
+          example: Syria
+        coordinate:
+          type: string
+          minLength: 7
+          maxLength: 32
+          pattern: ^-?\d{1,2}\.\d+,-?\d{1,3}\.\d+$
+          example: 39.3112722,-102.2917972
+      required:
+        - wikidataId
+        - name
+        - coordinate
+    LocationList:
+      type: array
+      description: List of Locations related to the Event.
+      items:
+        $ref: "#/components/schemas/Location"
+      minItems: 0
+      maxItems: 200
+    EventTimeStateRelativeToNow:
+      type: string
+      description: Indicates whether event is in past, happens now or will occur in future.
+      minLength: 4
+      maxLength: 7
+      pattern: ^[A-Z_]+$
+      enum:
+        - PAST
+        - ONGOING
+        - FUTURE
+      x-enumDescriptions:
+        PAST: The event has already completed.
+        ONGOING: The event is currently in progress.
+        FUTURE: The event is expected to happen in the future.
+    Event:
+      type: object
+      description: Historical political Event.
+      properties:
+        type:
+          allOf:
+            - $ref: "#/components/schemas/EventType"
+            - example: WARFARE_AND_ARMED_CONFLICTS
+        wikidataId:
+          $ref: "#/components/schemas/WikidataId"
+        wikidataUrl:
+          $ref: "#/components/schemas/WikidataUrl"
+        name:
+          $ref: "#/components/schemas/EventName"
+        description:
+          $ref: "#/components/schemas/EventDescription"
+        wikipediaUrl:
+          $ref: "#/components/schemas/WikipediaUrl"
+        imageUrl:
+          $ref: "#/components/schemas/EventImageUrl"
+        regions:
+          $ref: "#/components/schemas/RegionList"
+        countries:
+          $ref: "#/components/schemas/CountryList"
+        locations:
+          $ref: "#/components/schemas/LocationList"
+        timeStateRelativeToNow:
+          $ref: "#/components/schemas/EventTimeStateRelativeToNow"
+        startDateTime:
+          $ref: "#/components/schemas/DateTime"
+        endDateTime:
+          $ref: "#/components/schemas/DateTime"
+      required:
+        - type
+        - wikidataId
+        - wikidataUrl
+        - name
+        - timeStateRelativeToNow
+        - startDateTime
+    Pagination:
+      type: object
+      description: Pagination metadata for list responses.
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+        pageSize:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 1000
+          example: 100
+        totalItems:
+          type: integer
+          format: int64
+          minimum: 0
+          example: 256
+        totalPages:
+          type: integer
+          format: int32
+          minimum: 0
+          example: 3
+        hasNextPage:
+          type: boolean
+          example: true
+      required:
+        - page
+        - pageSize
+        - totalItems
+        - totalPages
+        - hasNextPage
+    EventListResponseBody:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Event"
+          minItems: 0
+          maxItems: 1000
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+      required:
+        - data
+        - pagination
     ResourceId:
       type: string
       example: a1
@@ -452,58 +660,6 @@ components:
         source:
           type: string
           description: An object containing references to the source of the error.
-    EventType:
-      type: string
-      description: Type of an Event.
-    WikidataId:
-      type: string
-      description: Record ID of a data item in https://www.wikidata.org.
-      example: http://www.wikidata.org/entity/Q178810
-    EventName:
-      type: string
-      description: Name of a historical political Event.
-      example: Syrian Civil War
-    EventTimeStateRelativeToNow:
-      type: string
-      description: Indicates wherether event is in past, happens now or will occur in future.
-    DateTime:
-      type: string
-      description: Event timestamp; can be time or date, as well as month or year.
-      format: dateTime
-    Event:
-      type: object
-      description: Historical political Event.
-      properties:
-        type:
-          allOf:
-            - $ref: "#/components/schemas/EventType"
-            - example: WARFARE_AND_ARMED_CONFLICTS
-        wikidataId:
-          allOf:
-            - $ref: "#/components/schemas/WikidataId"
-        name:
-          $ref: "#/components/schemas/EventName"
-        timeStateRelativeToNow:
-          allOf:
-            - $ref: "#/components/schemas/EventTimeStateRelativeToNow"
-            - example: FUTURE
-        startTime:
-          allOf:
-            - $ref: "#/components/schemas/DateTime"
-            - example: "2011-03-15"
-      required:
-        - type
-        - wikidataId
-        - name
-        - startTime
-    EventListResponseBody:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/Event"
-          maxItems: 10000
     Error400:
       allOf:
         - $ref: "#/components/schemas/BasicErrorObject"
@@ -558,278 +714,12 @@ components:
               example: 429
             title:
               example: Too many requests
-    event_EventType:
-      type: string
-      description: Type of an Event.
-      minLength: 3
-      maxLength: 100
-      pattern: ^[A-Z][A-Z0-9_]*$
-      enum:
-        - GEOPOLITICAL_GROUP
-        - INTERNATIONAL_ORGANISATION
-        - MILITARY_ALLIANCE
-        - MULTINATIONAL_MILITARY_COALITION
-        - POLITICAL_CONFERENCE
-        - POLITICAL_CRISIS
-        - POLITICAL_MURDER
-        - SOURCE_OF_INTERNATIONAL_LAW
-        - SUPRANATIONAL_UNION
-        - WARFARE_AND_ARMED_CONFLICTS
-      x-enumDescriptions:
-        GEOPOLITICAL_GROUP: Political grouping of states with shared geopolitical interests.
-        INTERNATIONAL_ORGANISATION: Intergovernmental organisation operating across multiple countries.
-        MILITARY_ALLIANCE: Formal military alliance between states.
-        MULTINATIONAL_MILITARY_COALITION: Coalition of multiple countries formed for military operations.
-        POLITICAL_CONFERENCE: Formal political conference involving state or institutional actors.
-        POLITICAL_CRISIS: Significant political instability or confrontation.
-        POLITICAL_MURDER: Politically motivated assassination or killing.
-        SOURCE_OF_INTERNATIONAL_LAW: Treaty, convention, or other recognised source of international law.
-        SUPRANATIONAL_UNION: Union in which member states delegate authority to shared institutions.
-        WARFARE_AND_ARMED_CONFLICTS: Armed hostilities, military operations, and violent conflict between organised actors.
-    Region:
-      type: string
-      description: World Region.
-      minLength: 10
-      maxLength: 40
-      pattern: ^[A-Z_]+$
-      enum:
-        - EAST_ASIA_AND_PACIFIC
-        - EUROPE_AND_CENTRAL_ASIA
-        - LATIN_AMERICA_AND_CARIBBEAN
-        - MIDDLE_EAST_AND_NORTH_AFRICA
-        - NORTH_AMERICA
-        - SOUTH_ASIA
-        - SUB_SAHARAN_AFRICA
-      x-enumDescriptions:
-        EAST_ASIA_AND_PACIFIC: Countries in East Asia, Southeast Asia, and Pacific island regions.
-        EUROPE_AND_CENTRAL_ASIA: Countries in Europe and Central Asia.
-        LATIN_AMERICA_AND_CARIBBEAN: Countries in Latin America and Caribbean regions.
-        MIDDLE_EAST_AND_NORTH_AFRICA: Countries in the Middle East and North Africa.
-        NORTH_AMERICA: Countries in North America.
-        SOUTH_ASIA: Countries in South Asia.
-        SUB_SAHARAN_AFRICA: Countries in Sub-Saharan Africa.
-    event_DateTime:
-      type: string
-      description: Event timestamp in UTC using ISO 8601 date-time format.
-      minLength: 20
-      maxLength: 35
-      format: date-time
-      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$
-      example: "2011-03-15T00:00:00Z"
-    event_WikidataId:
-      type: string
-      description: Wikidata entity ID (e.g., Q178810).
-      minLength: 2
-      maxLength: 32
-      pattern: ^Q[1-9][0-9]*$
-      example: Q178810
-    WikidataUrl:
-      type: string
-      description: URL of the corresponding Wikidata item.
-      minLength: 27
-      maxLength: 120
-      format: uri
-      pattern: ^https?://(www\.)?wikidata\.org/wiki/Q[1-9][0-9]*$
-      example: https://www.wikidata.org/wiki/Q178810
-    event_EventName:
-      type: string
-      description: Name of a historical political Event.
-      minLength: 1
-      maxLength: 200
-      pattern: ^.*\S.*$
-      example: Syrian Civil War
-    EventDescription:
-      type: string
-      description: Detailed information about a historical political Event.
-      minLength: 1
-      maxLength: 5000
-      pattern: ^.*\S.*$
-      example: "The Syrian civil war is an ongoing multi-sided civil war in Syria fought between the Ba'athist Syrian Arab Republic led by Syrian President Bashar al-Assad, along with domestic and foreign allies, and various domestic and foreign forces opposing both the Syrian government and each other in varying combinations. The war is currently the second deadliest of the 21st century. "
-    WikipediaUrl:
-      type: string
-      description: URL of the corresponding Wikipedia article.
-      minLength: 24
-      maxLength: 300
-      format: uri
-      pattern: ^https?://([a-z]{2,3}\.)?wikipedia\.org/wiki/.+$
-      example: https://en.wikipedia.org/wiki/Syrian_civil_war
-    EventImageUrl:
-      type: string
-      description: URL of an image representing the event.
-      minLength: 12
-      maxLength: 500
-      format: uri
-      pattern: ^https?://.+$
-      example: https://upload.wikimedia.org/example/event-image.jpg
-    RegionList:
-      type: array
-      description: List of World Regions to filter Events.
-      items:
-        $ref: "#/components/schemas/Region"
-      minItems: 0
-      maxItems: 10
-    Country:
-      type: object
-      description: Information about a Country related to the Event.
-      properties:
-        wikidataId:
-          allOf:
-            - $ref: "#/components/schemas/event_WikidataId"
-            - example: Q858
-        name:
-          type: string
-          minLength: 1
-          maxLength: 120
-          pattern: ^.*\S.*$
-          example: Syria
-      required:
-        - wikidataId
-        - name
-    CountryList:
-      type: array
-      description: List of Countries related to the Event.
-      items:
-        $ref: "#/components/schemas/Country"
-      minItems: 0
-      maxItems: 200
-    Location:
-      type: object
-      description: Information about a Location related to the Event.
-      properties:
-        wikidataId:
-          allOf:
-            - $ref: "#/components/schemas/event_WikidataId"
-            - example: Q858
-        name:
-          type: string
-          minLength: 1
-          maxLength: 120
-          pattern: ^.*\S.*$
-          example: Syria
-        coordinate:
-          type: string
-          minLength: 7
-          maxLength: 32
-          pattern: ^-?\d{1,2}\.\d+,-?\d{1,3}\.\d+$
-          example: 39.3112722,-102.2917972
-      required:
-        - wikidataId
-        - name
-        - coordinate
-    LocationList:
-      type: array
-      description: List of Locations related to the Event.
-      items:
-        $ref: "#/components/schemas/Location"
-      minItems: 0
-      maxItems: 200
-    event_EventTimeStateRelativeToNow:
-      type: string
-      description: Indicates whether event is in past, happens now or will occur in future.
-      minLength: 4
-      maxLength: 7
-      pattern: ^[A-Z_]+$
-      enum:
-        - PAST
-        - ONGOING
-        - FUTURE
-      x-enumDescriptions:
-        PAST: The event has already completed.
-        ONGOING: The event is currently in progress.
-        FUTURE: The event is expected to happen in the future.
-    event_Event:
-      type: object
-      description: Historical political Event.
-      properties:
-        type:
-          allOf:
-            - $ref: "#/components/schemas/event_EventType"
-            - example: WARFARE_AND_ARMED_CONFLICTS
-        wikidataId:
-          $ref: "#/components/schemas/event_WikidataId"
-        wikidataUrl:
-          $ref: "#/components/schemas/WikidataUrl"
-        name:
-          $ref: "#/components/schemas/event_EventName"
-        description:
-          $ref: "#/components/schemas/EventDescription"
-        wikipediaUrl:
-          $ref: "#/components/schemas/WikipediaUrl"
-        imageUrl:
-          $ref: "#/components/schemas/EventImageUrl"
-        regions:
-          $ref: "#/components/schemas/RegionList"
-        countries:
-          $ref: "#/components/schemas/CountryList"
-        locations:
-          $ref: "#/components/schemas/LocationList"
-        timeStateRelativeToNow:
-          $ref: "#/components/schemas/event_EventTimeStateRelativeToNow"
-        startDateTime:
-          $ref: "#/components/schemas/event_DateTime"
-        endDateTime:
-          $ref: "#/components/schemas/event_DateTime"
-      required:
-        - type
-        - wikidataId
-        - wikidataUrl
-        - name
-        - timeStateRelativeToNow
-        - startDateTime
-    Pagination:
-      type: object
-      description: Pagination metadata for list responses.
-      properties:
-        page:
-          type: integer
-          format: int32
-          minimum: 1
-          example: 1
-        pageSize:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 1000
-          example: 100
-        totalItems:
-          type: integer
-          format: int64
-          minimum: 0
-          example: 256
-        totalPages:
-          type: integer
-          format: int32
-          minimum: 0
-          example: 3
-        hasNextPage:
-          type: boolean
-          example: true
-      required:
-        - page
-        - pageSize
-        - totalItems
-        - totalPages
-        - hasNextPage
-    event_EventListResponseBody:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/event_Event"
-          minItems: 0
-          maxItems: 1000
-        pagination:
-          $ref: "#/components/schemas/Pagination"
-      required:
-        - data
-        - pagination
     EventTypeMetadataItem:
       type: object
       description: Metadata entry for an event type filter value.
       properties:
         code:
-          $ref: "#/components/schemas/event_EventType"
+          $ref: "#/components/schemas/EventType"
         name:
           type: string
           minLength: 1

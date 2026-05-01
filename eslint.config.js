@@ -4,7 +4,7 @@ const importPlugin = require("eslint-plugin-import");
 
 module.exports = [
   {
-    ignores: ["**/*.css"]
+    ignores: ["**/*.css", "**/*.md"]
   },
   ...nextVitals,
   prettierRecommended,
@@ -26,7 +26,7 @@ module.exports = [
           extensions: [".js", ".jsx"]
         }
       ],
-      "react/prop-types": 0,
+      "react/prop-types": "error",
       "no-underscore-dangle": ["off"],
       "no-param-reassign": ["off"],
       "class-methods-use-this": ["off"],

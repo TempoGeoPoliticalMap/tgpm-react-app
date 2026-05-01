@@ -20,12 +20,14 @@ npm run build      # Production build (Turbopack)
 npm run start      # Start production server
 npm run lint       # Lint pages/ and src/ (.js, .jsx)
 npm run lint:fix   # Auto-fix lint errors
+npm test           # Run test suite (Jest + Testing Library)
+npm run test:coverage  # Run tests with coverage report
 ```
 
 Notes:
 - If `next build` fails with a local Turbopack environment issue, use:
   - `npx next build --webpack`
-- ESLint currently uses legacy config files (`.eslintrc.json`, `.eslintignore`) with ESLint v9 installed. Lint may fail until migrated to `eslint.config.js`.
+- ESLint uses flat config (`eslint.config.js`); there is no `.eslintrc.json` or `.eslintignore`.
 
 ## Architecture
 
@@ -61,13 +63,13 @@ OpenAPI source:
 
 Regeneration workflow:
 - Run from repository root:
-  - `bash scripts/openapi.sh`
+  - `make openapi`
+- The spec SHA is pinned in `config.env` (`SPEC_SHA=<sha>`); update it before regenerating.
 
-What this script does:
-- Downloads latest OpenAPI spec
+What this does:
+- Downloads the bundled OpenAPI spec at the pinned SHA from `TempoGeoPoliticalMap/tgpm-openapi`
 - Applies local spec patching
-- Recreates `src/@generated`
-- Runs `openapi-generator-cli` for `typescript-axios`
+- Recreates `src/@generated/` via `openapi-generator-cli` v7.9.0 (`typescript-axios`)
 
 ## Conventions
 
@@ -78,6 +80,4 @@ What this script does:
 
 ## Known Gaps / Cleanup Targets
 
-- ESLint v9 flat config migration is pending.
-- Legacy template components exist and may be unused.
-- No automated test suite is currently configured.
+- 2 moderate `npm audit` vulnerabilities (PostCSS XSS, `GHSA-qx2v-qp2m-jg93`) are blocked on an upstream Next.js fix. Next.js 16.2.4 (current latest, including canary) still bundles PostCSS 8.4.31; the fix requires PostCSS ≥8.5.10. Unresolvable until Next.js ships a release that bumps their internal PostCSS dependency.

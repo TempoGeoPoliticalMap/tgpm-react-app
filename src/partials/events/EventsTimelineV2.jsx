@@ -1,12 +1,11 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo} from "react";
+import PropTypes from "prop-types";
 import {Tooltip} from "antd";
 
-import {axiosInstance} from "../../api/api";
-import LoadingSpinner from "../../components/LoadingSpinner";
 import {TYPES} from "../../constants/eventsV2Types";
-import {filterAndSortEventsV2} from "../../utils/filterAndSortEventsV2";
 import {formatDateTime} from "../../utils/formatDateTime";
 import {TYPE_ICONS} from "../../constants/eventsV2Types";
+import {safeHref} from "../../utils/safeHref";
 
 const TODAY = new Date();
 
@@ -19,64 +18,23 @@ const STATUS_BAR_COLORS = {
   FUTURE: "bg-slate-400"
 };
 
-function EventsTimelineV2({data, typeFilter, statusFilter, regionFilter, fromDate, toDate, events}) {
-  const [eventsList, setEventsList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (events) {
-      setError(null);
-      setLoading(false);
-      return;
-    }
-
-    if (data) {
-      setEventsList(data.data);
-      setError(null);
-      setTimeout(() => setLoading(false), 500);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    const fetchEvents = async () => {
-      try {
-        const response = await axiosInstance.get("v2/events");
-
-        if (!cancelled) setEventsList(response.data.data);
-      } catch (err) {
-        if (!cancelled) setError("Failed to load events. Please try again later.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    fetchEvents();
-    return () => {
-      cancelled = true;
-    };
-  }, [data, events]);
-
-  const filtered = useMemo(() => {
-    if (events) return events;
-    return filterAndSortEventsV2(eventsList, {typeFilter, statusFilter, regionFilter, fromDate, toDate});
-  }, [events, eventsList, typeFilter, statusFilter, regionFilter, fromDate, toDate]);
-
+function EventsTimelineV2({events = []}) {
   const {minDate, maxDate, totalMs} = useMemo(() => {
-    if (!filtered.length) {
+    if (!events.length) {
       const min = new Date(TODAY);
       min.setFullYear(min.getFullYear() - 1);
       const max = new Date(TODAY);
       max.setFullYear(max.getFullYear() + 1);
       return {minDate: min, maxDate: max, totalMs: max - min};
     }
-    const starts = filtered.map(e => new Date(e.startDateTime).getTime());
-    const ends = filtered.map(e => (e.endDateTime ? new Date(e.endDateTime) : TODAY).getTime());
+    const starts = events.map(e => new Date(e.startDateTime).getTime());
+    const ends = events.map(e => (e.endDateTime ? new Date(e.endDateTime) : TODAY).getTime());
     const min = new Date(Math.min(...starts));
     const max = new Date(Math.max(...ends, TODAY.getTime()));
     min.setMonth(min.getMonth() - 3);
     max.setMonth(max.getMonth() + 3);
     return {minDate: min, maxDate: max, totalMs: max.getTime() - min.getTime()};
-  }, [filtered]);
+  }, [events]);
 
   const yearMarkers = useMemo(() => {
     const markers = [];
@@ -89,9 +47,6 @@ function EventsTimelineV2({data, typeFilter, statusFilter, regionFilter, fromDat
   }, [minDate, maxDate, totalMs]);
 
   const todayLeft = ((TODAY.getTime() - minDate.getTime()) / totalMs) * 100;
-
-  if (loading) return <LoadingSpinner />;
-  if (error) return <div className="p-5 text-red-500">{error}</div>;
 
   return (
     <div className="bg-white overflow-x-auto">
@@ -113,7 +68,7 @@ function EventsTimelineV2({data, typeFilter, statusFilter, regionFilter, fromDat
       </div>
 
       {/* Rows */}
-      {filtered.map(event => {
+      {events.map(event => {
         const startMs = new Date(event.startDateTime).getTime();
         const endMs = (event.endDateTime ? new Date(event.endDateTime) : TODAY).getTime();
         const left = Math.max(0, ((startMs - minDate.getTime()) / totalMs) * 100);
@@ -135,17 +90,17 @@ function EventsTimelineV2({data, typeFilter, statusFilter, regionFilter, fromDat
               style={{width: NAME_COL_WIDTH, minWidth: NAME_COL_WIDTH}}
               className="px-2 py-1 flex flex-col justify-center text-sm text-black">
               <div className="font-bold">
-                {event.wikipediaUrl ? (
-                  <a href={event.wikipediaUrl} target="_blank" rel="noreferrer" className="hover:underline">
+                {safeHref(event.wikipediaUrl) ? (
+                  <a href={safeHref(event.wikipediaUrl)} target="_blank" rel="noreferrer" className="hover:underline">
                     {event.name}
                   </a>
                 ) : (
                   event.name
                 )}
-                {event.wikidataUrl && (
+                {safeHref(event.wikidataUrl) && (
                   <span className="ml-1 font-normal text-xs text-gray-400">
                     (
-                    <a href={event.wikidataUrl} target="_blank" rel="noreferrer" className="hover:underline">
+                    <a href={safeHref(event.wikidataUrl)} target="_blank" rel="noreferrer" className="hover:underline">
                       {event.wikidataId}
                     </a>
                     )
@@ -159,7 +114,6 @@ function EventsTimelineV2({data, typeFilter, statusFilter, regionFilter, fromDat
 
             {/* Timeline */}
             <div className="flex-1 relative flex items-center px-1 min-w-0">
-              {/* Year grid lines */}
               {yearMarkers.map(({year, left: yl}) => (
                 <div
                   key={year}
@@ -168,7 +122,6 @@ function EventsTimelineV2({data, typeFilter, statusFilter, regionFilter, fromDat
                 />
               ))}
 
-              {/* Today line */}
               {todayLeft >= 0 && todayLeft <= 100 && (
                 <div
                   style={{left: `${todayLeft}%`}}
@@ -176,7 +129,6 @@ function EventsTimelineV2({data, typeFilter, statusFilter, regionFilter, fromDat
                 />
               )}
 
-              {/* Bar */}
               <Tooltip title={tooltipTitle}>
                 <div
                   style={{left: `${left}%`, width: `${width}%`}}
@@ -190,5 +142,9 @@ function EventsTimelineV2({data, typeFilter, statusFilter, regionFilter, fromDat
     </div>
   );
 }
+
+EventsTimelineV2.propTypes = {
+  events: PropTypes.arrayOf(PropTypes.object)
+};
 
 export default EventsTimelineV2;

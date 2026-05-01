@@ -1,8 +1,9 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo} from "react";
+import PropTypes from "prop-types";
 import dynamic from "next/dynamic";
 
-import {axiosInstance} from "../../api/api";
 import LoadingSpinner from "../LoadingSpinner";
+import {useEventsV2} from "../../hooks/useEventsV2";
 import {filterAndSortEventsV2} from "../../utils/filterAndSortEventsV2";
 
 const EventsTableV2 = dynamic(() => import("../../partials/events/EventsTableV2"), {
@@ -26,54 +27,22 @@ const EventsCompactV2 = dynamic(() => import("../../partials/events/EventsCompac
 });
 
 function EventsV2({mockData, activeView = "table", typeFilter = [], fromDate = null, toDate = null}) {
-  const [eventsList, setEventsList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const live = useEventsV2({
+    types: typeFilter,
+    timeslotStart: fromDate ? fromDate.startOf("day").toISOString() : null,
+    timeslotEnd: toDate ? toDate.endOf("day").toISOString() : null
+  });
 
-  useEffect(() => {
-    if (mockData) {
-      setEventsList(mockData.data);
-      setError(null);
-      setLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-    setLoading(true);
-
-    const fetchEvents = async () => {
-      try {
-        const response = await axiosInstance.get("v2/events");
-
-        if (!cancelled) {
-          setEventsList(response.data.data);
-          setError(null);
-        }
-      } catch (err) {
-        if (!cancelled) setError("Failed to load events. Please try again later.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    fetchEvents();
-    return () => {
-      cancelled = true;
-    };
-  }, [mockData]);
+  const rawEvents = mockData ? mockData.data : live.events;
+  const loading = mockData ? false : live.loading;
+  const error = mockData ? null : live.error;
 
   const filteredEvents = useMemo(
-    () => filterAndSortEventsV2(eventsList, {typeFilter, statusFilter: [], regionFilter: [], fromDate, toDate}),
-    [eventsList, typeFilter, fromDate, toDate]
+    () => filterAndSortEventsV2(rawEvents, {typeFilter, statusFilter: [], regionFilter: [], fromDate, toDate}),
+    [rawEvents, typeFilter, fromDate, toDate]
   );
 
-  const props = {
-    data: mockData,
-    typeFilter,
-    fromDate,
-    toDate,
-    events: filteredEvents
-  };
+  const props = {typeFilter, fromDate, toDate, events: filteredEvents};
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="p-5 text-red-500">{error}</div>;
@@ -89,11 +58,19 @@ function EventsV2({mockData, activeView = "table", typeFilter = [], fromDate = n
     <div className="flex h-screen overflow-hidden">
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden bg-white">
         <main>
-          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">{content}</div>
+          <div className="w-full">{content}</div>
         </main>
       </div>
     </div>
   );
 }
+
+EventsV2.propTypes = {
+  mockData: PropTypes.shape({data: PropTypes.array}),
+  activeView: PropTypes.oneOf(["table", "timeline", "map", "compact"]),
+  typeFilter: PropTypes.arrayOf(PropTypes.string),
+  fromDate: PropTypes.object,
+  toDate: PropTypes.object
+};
 
 export default EventsV2;

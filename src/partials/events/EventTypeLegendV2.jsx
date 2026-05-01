@@ -1,16 +1,12 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {Select} from "antd";
 
 import {TYPE_ICONS, TYPES} from "../../constants/eventsV2Types";
 
 const OPTIONS = Object.keys(TYPE_ICONS).map(key => ({
   value: key,
-  label: (
-    <span className="flex items-center gap-2">
-      {TYPE_ICONS[key]}
-      {TYPES[key].NAME}
-    </span>
-  )
+  label: TYPES[key].NAME
 }));
 
 function EventTypeLegendV2({selectedTypes, onChange}) {
@@ -22,13 +18,24 @@ function EventTypeLegendV2({selectedTypes, onChange}) {
       value={selectedTypes}
       onChange={onChange}
       options={OPTIONS}
+      optionRender={option => (
+        <span className="flex items-center gap-2">
+          {TYPE_ICONS[option.value]}
+          {option.label}
+        </span>
+      )}
       virtual={false}
       listHeight={1000}
       getPopupContainer={trigger => trigger.parentElement}
-      dropdownStyle={{zIndex: 2300, maxHeight: "none", overflow: "visible"}}
+      styles={{popup: {root: {zIndex: 2300, maxHeight: "none", overflow: "visible"}}}}
       style={{minWidth: 269}}
     />
   );
 }
+
+EventTypeLegendV2.propTypes = {
+  selectedTypes: PropTypes.array,
+  onChange: PropTypes.func.isRequired
+};
 
 export default EventTypeLegendV2;
