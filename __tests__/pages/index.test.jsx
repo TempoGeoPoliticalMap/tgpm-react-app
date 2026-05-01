@@ -2,7 +2,7 @@
 import React from "react";
 import {render, screen, fireEvent, waitFor} from "@testing-library/react";
 
-import Home from "../index";
+import Home from "../../pages/index";
 
 // Capture props passed to EventsV2 as data attributes for easy assertion
 jest.mock("../../src/components/events/EventsV2", () => ({

@@ -15,11 +15,11 @@ const config = {
   moduleNameMapper: {
     "\\.(css|less|scss|sass)$": "<rootDir>/__mocks__/styleMock.js"
   },
-  testMatch: ["<rootDir>/src/**/*.test.{js,jsx}", "<rootDir>/pages/**/*.test.{js,jsx}"],
+  testMatch: ["<rootDir>/src/**/*.test.{js,jsx}", "<rootDir>/__tests__/**/*.test.{js,jsx}"],
   coverageThreshold: {
     global: {
       lines: 70,
-      functions: 70,
+      functions: 75,
       branches: 65
     }
   }
