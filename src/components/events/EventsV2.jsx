@@ -26,6 +26,11 @@ const EventsCompactV2 = dynamic(() => import("../../partials/events/EventsCompac
   loading: () => <div className="p-5 text-slate-400">Loading…</div>
 });
 
+const EventsMobileV2 = dynamic(() => import("../../partials/events/EventsMobileV2"), {
+  ssr: false,
+  loading: () => <div className="p-5 text-slate-400">Loading…</div>
+});
+
 function EventsV2({mockData, activeView = "table", typeFilter = [], fromDate = null, toDate = null}) {
   const live = useEventsV2({
     types: typeFilter,
@@ -51,11 +56,12 @@ function EventsV2({mockData, activeView = "table", typeFilter = [], fromDate = n
     table: <EventsTableV2 {...props} />,
     timeline: <EventsTimelineV2 {...props} />,
     map: <EventsMapV2 {...props} />,
-    compact: <EventsCompactV2 {...props} />
+    compact: <EventsCompactV2 {...props} />,
+    mobile: <EventsMobileV2 {...props} />
   }[activeView];
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-[100dvh] overflow-hidden">
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden bg-white">
         <main>
           <div className="w-full">{content}</div>
@@ -67,7 +73,7 @@ function EventsV2({mockData, activeView = "table", typeFilter = [], fromDate = n
 
 EventsV2.propTypes = {
   mockData: PropTypes.shape({data: PropTypes.array}),
-  activeView: PropTypes.oneOf(["table", "timeline", "map", "compact"]),
+  activeView: PropTypes.oneOf(["table", "timeline", "map", "compact", "mobile"]),
   typeFilter: PropTypes.arrayOf(PropTypes.string),
   fromDate: PropTypes.object,
   toDate: PropTypes.object

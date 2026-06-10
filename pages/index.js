@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import Head from "next/head";
 import {DatePicker} from "antd";
 
+import {useMobileDetect} from "../src/hooks/useMobileDetect";
 import MinimalHeader from "../src/components/MinimalHeader";
 import EventsV2 from "../src/components/events/EventsV2";
 import {ErrorBoundary} from "../src/components/ErrorBoundary";
@@ -17,7 +18,9 @@ const VIEWS = [
 ];
 
 function Home() {
-  const [activeView, setActiveView] = useState("table");
+  const isMobile = useMobileDetect();
+  const [desktopView, setDesktopView] = useState("table");
+  const activeView = isMobile ? "mobile" : desktopView;
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
@@ -55,10 +58,10 @@ function Home() {
       </Head>
       <div className="flex flex-col min-h-screen overflow-hidden bg-white">
         <MinimalHeader
-          filtersNode={filtersNode}
+          filtersNode={isMobile ? null : filtersNode}
           activeView={activeView}
-          onViewChange={setActiveView}
-          views={VIEWS}
+          onViewChange={setDesktopView}
+          views={isMobile ? [] : VIEWS}
           collapsed={collapsed}
           onCollapse={onCollapse}
         />
