@@ -101,6 +101,33 @@ Three new test suites ship with this release:
 
 ---
 
+## Dependency security updates
+
+`npm audit fix` was run as part of this branch. Two production dependencies with HIGH-severity advisories were upgraded:
+
+| Package | Before | After | Advisories fixed |
+|---|---|---|---|
+| `axios` | 1.13.x | **1.17.0** | GHSA-pjwm-pj3p-43mv, GHSA-898c-q2cr-xwhg, GHSA-35jp-ww65-95wh (and others — DoS, header injection, proxy bypass via prototype pollution) |
+| `next` | 16.2.4 | **16.2.9** | GHSA-8h8q-6873-q5fj, GHSA-26hh-7cqf-hhc6, GHSA-3g8h-86w9-wvmq (and others — denial of service, middleware/proxy bypass, cache poisoning) |
+
+One moderate advisory (`postcss < 8.5.10` bundled inside `next`) and two moderate advisories (`brace-expansion`, `ws`) were also resolved as part of the same fix run.
+
+`shell-quote` (CRITICAL, `GHSA-w7jw-789q-3m8p`) remains unresolved. It is an indirect devDependency via `@openapitools/openapi-generator-cli` → `concurrently` and is never included in the production build. The only npm-offered fix would downgrade the CLI wrapper to 2.23.0, breaking the pinned 7.9.0 Java generator. It is excluded from the CI audit gate (see below).
+
+---
+
+## CI updates
+
+### Node.js 24
+
+The CI workflow (`jobs.test`) now runs on `node-version: 24`. GitHub Actions is deprecating Node.js 20 as the runner runtime for `actions/checkout` and `actions/setup-node`, with forced migration to Node.js 24 on 16 June 2026.
+
+### Production-only audit gate
+
+The audit step is now `npm audit --audit-level=high --omit=dev`. The `--omit=dev` flag restricts the audit to production dependencies, excluding the `shell-quote` CRITICAL that is locked inside the devDependency `@openapitools/openapi-generator-cli` with no safe upgrade path. All production dependencies are clean at HIGH+.
+
+---
+
 ## Documentation
 
 - **`README.md`** — "Views" table added, listing all five views with trigger and description.
@@ -121,3 +148,4 @@ Fully backward compatible. The existing Table, Timeline, Map, and Compact views 
 - On the initial server render, `useMobileDetect` always returns `false`, so mobile users see a brief flash of the desktop layout before the mobile view activates after mount. Minimised by the responsive hero classes and the immediate client-side switch, but a CSS-only pre-JS solution (e.g. hiding desktop-only elements below the breakpoint) would eliminate it entirely.
 - The mobile view is a card list only — it does not support the map, timeline, or compact visualisations. Tapping a card opens the Wikipedia page in a new tab; there is no in-app detail view.
 - End-to-end tests (Playwright/Cypress) covering the resize breakpoint behaviour are deferred to a future release.
+- `shell-quote` CRITICAL (`GHSA-w7jw-789q-3m8p`) in the devDependency `@openapitools/openapi-generator-cli` has no safe upgrade path and is excluded from the CI audit gate via `--omit=dev`. Production dependencies are clean. Tracked in `AGENTS.md`.

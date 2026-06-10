@@ -83,4 +83,4 @@ What this does:
 
 ## Known Gaps / Cleanup Targets
 
-- 2 moderate `npm audit` vulnerabilities (PostCSS XSS, `GHSA-qx2v-qp2m-jg93`) are blocked on an upstream Next.js fix. Next.js 16.2.4 (current latest, including canary) still bundles PostCSS 8.4.31; the fix requires PostCSS ≥8.5.10. Unresolvable until Next.js ships a release that bumps their internal PostCSS dependency.
+- `shell-quote` (CRITICAL, `GHSA-w7jw-789q-3m8p`) is an indirect devDependency via `@openapitools/openapi-generator-cli >=2.23.1` → `concurrently`. It never ships to production. The only npm-offered fix downgrades the CLI wrapper to 2.23.0, which conflicts with the 7.9.0 Java generator pinned in `openapitools.json`. The CI audit gate uses `--omit=dev` to exclude it; production dependencies are clean.
