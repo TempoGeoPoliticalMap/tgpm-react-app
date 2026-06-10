@@ -69,6 +69,11 @@ jest.mock("next/head", () => ({
 describe("Home (pages/index.js)", () => {
   beforeEach(() => {
     localStorage.clear();
+    window.matchMedia = jest.fn(() => ({
+      matches: false,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn()
+    }));
   });
 
   test("default render passes activeView=table to EventsV2", () => {

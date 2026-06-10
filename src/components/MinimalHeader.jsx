@@ -169,8 +169,8 @@ function MinimalHeader({filtersNode, activeView, onViewChange, views = [], colla
           transition: "max-height 0.35s ease, opacity 0.25s ease",
           overflow: "hidden"
         }}>
-        <div className="relative z-10 px-6 pt-4 pb-16 flex flex-col items-center text-center">
-          <h1 className="text-white text-3xl font-bold leading-tight mb-3">
+        <div className="relative z-10 px-6 pt-4 pb-8 md:pb-16 flex flex-col items-center text-center">
+          <h1 className="text-white text-xl md:text-3xl font-bold leading-tight mb-3">
             Explore the World&apos;s political events
             <br />
             with data straight from Wikipedia
