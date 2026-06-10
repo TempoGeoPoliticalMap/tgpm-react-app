@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-TempoGeoPoliticalMap (TGPM) is a read-only data visualisation app that presents historical and ongoing political events sourced from Wikipedia via the TGPM backend API. Users can browse events in four views (Table, Timeline, Map, Compact) and filter by event type, date range, and other dimensions. The app has no user accounts and no server-side state; it is a pure client-side frontend backed by a public REST API.
+TempoGeoPoliticalMap (TGPM) is a read-only data visualisation app that presents historical and ongoing political events sourced from Wikipedia via the TGPM backend API. Users can browse events in five views (Table, Timeline, Map, Compact, and a dedicated Mobile card-list view that loads automatically on small screens) and filter by event type, date range, and other dimensions. The app has no user accounts and no server-side state; it is a pure client-side frontend backed by a public REST API.
 
 ## 2. Tech Stack
 
@@ -35,7 +35,8 @@ src/
   constants/
     eventsV2Types.js — TYPES, STATUSES, REGIONS, REGION_COLORS, TYPE_ICONS
   hooks/
-    useEventsV2.js   — fetches /v2/events; returns {events, loading, error}
+    useEventsV2.js      — fetches /v2/events; returns {events, loading, error}
+    useMobileDetect.js  — window.matchMedia hook; returns isMobile (SSR-safe, init false)
   mocks/
     handlers.js    — MSW request handlers (test fixture)
     server.js      — MSW node server (test setup)
@@ -46,6 +47,8 @@ src/
       EventsTimelineV2.jsx    — horizontal Gantt timeline; receives events[]
       EventsCompactV2.jsx     — split Gantt + embedded map; receives events[]
       EventsMapV2.jsx         — Leaflet map; receives events[]
+      EventsMobileV2.jsx      — mobile card-list container; receives events[]
+      EventMobileCardV2.jsx   — individual Wikipedia-style event card
       EventTypeLegendV2.jsx   — multi-select type filter
   utils/
     filterAndSortEventsV2.js  — pure filter/sort function
@@ -89,9 +92,13 @@ The script:
 ## 6. Data Flow
 
 ```
+useMobileDetect()  — window.matchMedia(≤768px); SSR-safe (init false)
+    ↓ isMobile
 pages/index.js
+  ├── views = isMobile ? [] : VIEWS   → passed to MinimalHeader (hides view switcher on mobile)
+  ├── filtersNode = isMobile ? null : filtersNode  → passed to MinimalHeader (hides filters on mobile)
   └── ErrorBoundary
-        └── EventsV2
+        └── EventsV2  (activeView = isMobile ? "mobile" : desktopView)
               ├── useEventsV2({types, timeslotStart, timeslotEnd})
               │     └── GET /v2/events?types=…&timeslot_start=…&timeslot_end=…
               ├── filterAndSortEventsV2  — client-side sort (+ belt-and-suspenders filter)
@@ -99,10 +106,14 @@ pages/index.js
                     ├── EventsTableV2    — receives events[]
                     ├── EventsTimelineV2 — receives events[]
                     ├── EventsMapV2      — receives events[]
-                    └── EventsCompactV2  — receives events[] (embeds EventsMapV2)
+                    ├── EventsCompactV2  — receives events[] (embeds EventsMapV2)
+                    └── EventsMobileV2   — receives events[] (mobile only)
+                          └── EventMobileCardV2 × N
 ```
 
 Filter state (`selectedTypes`, `fromDate`, `toDate`) originates in `pages/index.js`. It is passed to `EventsV2`, which forwards it to `useEventsV2` as server-side query params. A change to any filter triggers a fresh API call. `filterAndSortEventsV2` still runs client-side for sorting and as a safety net. View components receive the already-filtered `events` array and do no fetching of their own.
+
+On mobile the view switcher and filter bar are hidden, but filter state still flows through to the API call. Filters set on desktop are preserved if the viewport is resized to mobile width.
 
 ## 7. Views
 
@@ -112,6 +123,7 @@ Filter state (`selectedTypes`, `fromDate`, `toDate`) originates in `pages/index.
 | Timeline | `EventsTimelineV2` | Horizontal Gantt; year markers computed from event date range |
 | Map | `EventsMapV2` | Leaflet map with country highlight and location markers; coordinate validation via `parseCoordinate` |
 | Compact | `EventsCompactV2` | Synchronized table + Gantt + embedded map; ResizeObserver for Gantt width |
+| Mobile | `EventsMobileV2` | Auto-selected on ≤768 px; Wikipedia-style card list with thumbnail, name, description, dates, and Wikipedia link; view switcher and filters hidden |
 
 All view components are dynamically imported (`next/dynamic`, `ssr: false`) to avoid Leaflet SSR issues.
 

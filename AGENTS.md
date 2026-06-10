@@ -41,11 +41,13 @@ Main page composition:
   - `timeline` (`src/partials/events/EventsTimelineV2.jsx`)
   - `map` (`src/partials/events/EventsMapV2.jsx`)
   - `compact` (`src/partials/events/EventsCompactV2.jsx`)
+  - `mobile` (`src/partials/events/EventsMobileV2.jsx`)
 
 Data flow:
 - API client: `src/api/api.ts` (`axiosInstance`)
 - V2 filter/sort helper: `src/utils/filterAndSortEventsV2.js`
 - Event constants + icons: `src/constants/eventsV2Types.js`
+- Mobile detection hook: `src/hooks/useMobileDetect.js`
 
 ## Routing and Tooling Rules
 
@@ -77,6 +79,7 @@ What this does:
 - Page section composites: `src/partials/`
 - UI code: `.jsx`
 - API/generated client: `.ts`
+- On mobile (≤768 px), `useMobileDetect` forces `activeView` to `"mobile"` and passes `views={[]}` and `filtersNode={null}` to `MinimalHeader`, hiding both the view switcher and filter bar. Do not reinstate the view switcher or filter bar on small viewports. Filter state (`selectedTypes`, `fromDate`, `toDate`) is still forwarded to the API call on mobile — it is just not exposed in the UI.
 
 ## Known Gaps / Cleanup Targets
 

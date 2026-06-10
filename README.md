@@ -28,6 +28,16 @@ The app is deployed to **Netlify** automatically:
 
 No manual deployment steps are required.
 
+## Views
+
+| View | Trigger | Description |
+|---|---|---|
+| Table | default (desktop) | Sortable event table |
+| Timeline | desktop | Horizontal Gantt timeline |
+| Map | desktop | Interactive Leaflet map |
+| Compact | desktop | Synchronised table + Gantt + map |
+| Mobile | auto on ≤768 px | Wikipedia-style scrollable event cards |
+
 ## Stack
 
 - [Next.js 16](https://nextjs.org/) (Pages Router)
