@@ -43,25 +43,38 @@ function EventMobileCardV2({
   const startLabel = formatDateTime(startDateTime);
   const endLabel = timeStateRelativeToNow === "ONGOING" && !endDateTime ? "ongoing" : formatDateTime(endDateTime);
   const dotClass = STATUS_DOT[timeStateRelativeToNow] ?? "bg-slate-400";
+  const imageEl = imgSrc ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={imgSrc}
+      alt={name}
+      className="w-18 h-18 rounded object-cover flex-shrink-0"
+      style={{width: 72, height: 72}}
+    />
+  ) : (
+    <div
+      role="img"
+      aria-label={TYPES[type]?.NAME ?? type}
+      className="flex items-center justify-center rounded flex-shrink-0 bg-slate-100 text-2xl"
+      style={{width: 72, height: 72}}>
+      {TYPE_ICONS[type] ?? type}
+    </div>
+  );
 
   return (
     <div className="flex gap-3 py-3">
-      {imgSrc ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={imgSrc}
-          alt={name}
-          className="w-18 h-18 rounded object-cover flex-shrink-0"
-          style={{width: 72, height: 72}}
-        />
+      {titleHref ? (
+        <a
+          href={titleHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-hidden="true"
+          tabIndex={-1}
+          className="flex-shrink-0 cursor-pointer">
+          {imageEl}
+        </a>
       ) : (
-        <div
-          role="img"
-          aria-label={TYPES[type]?.NAME ?? type}
-          className="flex items-center justify-center rounded flex-shrink-0 bg-slate-100 text-2xl"
-          style={{width: 72, height: 72}}>
-          {TYPE_ICONS[type] ?? type}
-        </div>
+        imageEl
       )}
 
       <div className="flex flex-col gap-1 min-w-0">
@@ -70,7 +83,7 @@ function EventMobileCardV2({
             <a
               href={titleHref}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               aria-label={name}
               className="hover:underline text-slate-900">
               {name}

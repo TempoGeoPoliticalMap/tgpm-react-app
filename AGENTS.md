@@ -80,6 +80,7 @@ What this does:
 - UI code: `.jsx`
 - API/generated client: `.ts`
 - On mobile (≤768 px), `useMobileDetect` forces `activeView` to `"mobile"` and passes `views={[]}` and `filtersNode={null}` to `MinimalHeader`, hiding both the view switcher and filter bar. Do not reinstate the view switcher or filter bar on small viewports. Filter state (`selectedTypes`, `fromDate`, `toDate`) is still forwarded to the API call on mobile — it is just not exposed in the UI.
+have - In `EventMobileCardV2`, both the thumbnail image and the title link to the same `titleHref` (Wikipedia preferred, Wikidata fallback). The image `<a>` carries `aria-hidden="true"` and `tabIndex={-1}` — it is intentionally invisible to assistive technologies so the title link remains the sole AT entry point per card. Do not remove these attributes, and do not add `aria-label` to the image link (it is hidden from AT).
 
 ## Known Gaps / Cleanup Targets
 
