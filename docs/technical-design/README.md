@@ -123,7 +123,7 @@ On mobile the view switcher and filter bar are hidden, but filter state still fl
 | Timeline | `EventsTimelineV2` | Horizontal Gantt; year markers computed from event date range |
 | Map | `EventsMapV2` | Leaflet map with country highlight and location markers; coordinate validation via `parseCoordinate` |
 | Compact | `EventsCompactV2` | Synchronized table + Gantt + embedded map; ResizeObserver for Gantt width |
-| Mobile | `EventsMobileV2` | Auto-selected on ≤768 px; Wikipedia-style card list with thumbnail, name, description, dates, and Wikipedia link; view switcher and filters hidden |
+| Mobile | `EventsMobileV2` | Auto-selected on ≤768 px; Wikipedia-style card list with clickable thumbnail and name (both link to Wikipedia/Wikidata), description, dates; view switcher and filters hidden |
 
 All view components are dynamically imported (`next/dynamic`, `ssr: false`) to avoid Leaflet SSR issues.
 

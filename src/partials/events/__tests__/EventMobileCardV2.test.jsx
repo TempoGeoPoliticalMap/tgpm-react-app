@@ -56,38 +56,38 @@ describe("EventMobileCardV2", () => {
 
   test("renders img when imageUrl is a valid https URL", () => {
     render(<EventMobileCardV2 {...base} imageUrl="https://example.com/img.png" />);
-    const img = screen.getByRole("img", {name: "Test Conflict"});
+    const img = screen.getByRole("img", {name: "Test Conflict", hidden: true});
     expect(img.tagName).toBe("IMG");
     expect(img).toHaveAttribute("src", "https://example.com/img.png");
   });
 
   test("upgrades http imageUrl to https to avoid mixed-content blocking", () => {
     render(<EventMobileCardV2 {...base} imageUrl="http://commons.wikimedia.org/wiki/Special:FilePath/example.png" />);
-    const img = screen.getByRole("img", {name: "Test Conflict"});
+    const img = screen.getByRole("img", {name: "Test Conflict", hidden: true});
     expect(img.getAttribute("src")).toMatch(/^https:/);
   });
 
   test("appends ?width=144 to Wikimedia Special:FilePath URLs for thumbnail", () => {
     render(<EventMobileCardV2 {...base} imageUrl="https://commons.wikimedia.org/wiki/Special:FilePath/example.png" />);
-    const img = screen.getByRole("img", {name: "Test Conflict"});
+    const img = screen.getByRole("img", {name: "Test Conflict", hidden: true});
     expect(img.getAttribute("src")).toContain("width=144");
   });
 
   test("does not append width param to non-Wikimedia image URLs", () => {
     render(<EventMobileCardV2 {...base} imageUrl="https://example.com/img.png" />);
-    const img = screen.getByRole("img", {name: "Test Conflict"});
+    const img = screen.getByRole("img", {name: "Test Conflict", hidden: true});
     expect(img.getAttribute("src")).toBe("https://example.com/img.png");
   });
 
   test("renders type-icon fallback when imageUrl is null", () => {
     render(<EventMobileCardV2 {...base} imageUrl={null} />);
     expect(screen.queryByRole("img", {name: "Test Conflict"})).not.toBeInTheDocument();
-    expect(screen.getByRole("img", {name: /Warfare/i})).toBeInTheDocument();
+    expect(screen.getByRole("img", {name: /Warfare/i, hidden: true})).toBeInTheDocument();
   });
 
   test("renders type-icon fallback when imageUrl uses a non-http scheme", () => {
     render(<EventMobileCardV2 {...base} imageUrl="javascript:alert(1)" />);
-    expect(screen.getByRole("img", {name: /Warfare/i})).toBeInTheDocument();
+    expect(screen.getByRole("img", {name: /Warfare/i, hidden: true})).toBeInTheDocument();
   });
 
   test("shows 'ongoing' label for ONGOING status with no endDate", () => {
@@ -100,10 +100,45 @@ describe("EventMobileCardV2", () => {
     expect(screen.getByText(/2023-06-01/)).toBeInTheDocument();
   });
 
-  test("external links carry rel=noreferrer", () => {
+  test("external links carry rel=noopener noreferrer", () => {
     render(<EventMobileCardV2 {...base} />);
     const link = screen.getByRole("link", {name: "Test Conflict"});
-    expect(link).toHaveAttribute("rel", "noreferrer");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
     expect(link).toHaveAttribute("target", "_blank");
+  });
+
+  test("image link wraps img when titleHref resolves and imageUrl is valid", () => {
+    const {container} = render(<EventMobileCardV2 {...base} imageUrl="https://example.com/img.png" />);
+    const imageLink = container.querySelector("a[aria-hidden='true']");
+    expect(imageLink).toBeInTheDocument();
+    expect(imageLink).toHaveAttribute("href", "https://en.wikipedia.org/wiki/Test");
+    expect(imageLink.querySelector("img")).toBeInTheDocument();
+  });
+
+  test("image link is absent when both URLs are null", () => {
+    const {container} = render(<EventMobileCardV2 {...base} wikipediaUrl={null} wikidataUrl={null} />);
+    expect(container.querySelector("a[aria-hidden='true']")).not.toBeInTheDocument();
+  });
+
+  test("fallback div is wrapped in image link when titleHref resolves and imageUrl is null", () => {
+    const {container} = render(<EventMobileCardV2 {...base} imageUrl={null} />);
+    const imageLink = container.querySelector("a[aria-hidden='true']");
+    expect(imageLink).toBeInTheDocument();
+    expect(imageLink.querySelector("[role='img']")).toBeInTheDocument();
+  });
+
+  test("image link carries aria-hidden, tabIndex=-1, correct rel and target", () => {
+    const {container} = render(<EventMobileCardV2 {...base} imageUrl="https://example.com/img.png" />);
+    const imageLink = container.querySelector("a[aria-hidden='true'][tabindex='-1']");
+    expect(imageLink).toBeInTheDocument();
+    expect(imageLink).toHaveAttribute("rel", "noopener noreferrer");
+    expect(imageLink).toHaveAttribute("target", "_blank");
+  });
+
+  test("image link is absent from accessible query surface (aria-hidden)", () => {
+    render(<EventMobileCardV2 {...base} imageUrl="https://example.com/img.png" />);
+    // getByRole excludes aria-hidden elements — only the title link should be visible to AT
+    expect(screen.getAllByRole("link")).toHaveLength(1);
+    expect(screen.getByRole("link", {name: "Test Conflict"})).toBeInTheDocument();
   });
 });
